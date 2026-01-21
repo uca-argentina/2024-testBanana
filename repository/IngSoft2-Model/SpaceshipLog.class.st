@@ -89,6 +89,12 @@ SpaceshipLog >> addRandomCard [
 		cards add: randomCard new.
 ]
 
+{ #category : #initialization }
+SpaceshipLog >> beginIn: aBoard [
+
+	position := PositionTracker beginIn: aBoard.
+]
+
 { #category : #accessing }
 SpaceshipLog >> cards [
 ^cards 

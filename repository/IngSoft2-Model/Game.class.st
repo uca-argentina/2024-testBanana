@@ -168,13 +168,11 @@ lastEffectTriggered:= NullEffect new.
 { #category : #initialization }
 Game >> initializeSpaceships [
 
-	| numberOfPlayers |
-	numberOfPlayers := spaceshipsData size.
+	spaceships := spaceshipsData collect: [ :dataForASpaceship |
+		dataForASpaceship spaceship ].
 
-	spaceships := OrderedCollection new.
-	spaceships := spaceshipsData collect: [ :dataForASpaceship | dataForASpaceship spaceship ].
-	
-	spaceshipsData do: [ :dataForASpaceship | dataForASpaceship changePositionTo: (PositionTracker beginIn: board) ]
+	spaceshipsData do: [ :dataForASpaceship |
+		dataForASpaceship beginIn: board ]
 ]
 
 { #category : #action }
@@ -213,6 +211,14 @@ Game >> make: aSpaceship move: someSquares [
 
 	(self dataFor: aSpaceship) move:  someSquares 
 
+]
+
+{ #category : #action }
+Game >> move: aSpaceship byParsecs: aParsecAmount [
+
+	| squaresToMove |
+	squaresToMove := self convertToSquares: aParsecAmount.
+	self make: aSpaceship move: squaresToMove.
 ]
 
 { #category : #action }

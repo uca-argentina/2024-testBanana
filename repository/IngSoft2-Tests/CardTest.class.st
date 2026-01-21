@@ -1436,3 +1436,91 @@ CardTest >> test130CancellationCardCanRemoveActiveAccelerationCards [
 	aGame playTurn.
 	self assert: (((aGame positionOf: aSpaceship) = 4) and: ((aGame positionOf: anotherSpaceship) = 5) )
 ]
+
+{ #category : #tests }
+CardTest >> test131CancellationCardCannotBePlayedOnInstantaneousCards [
+
+	| aGame aSpaceship aBoard aDie aSpeedCard aRedoCard aRepeatCard aCancellationCard spaceshipsData |
+	aSpaceship := Spaceship launch: 'One'.
+	spaceshipsData := OrderedCollection with:
+					  (SpaceshipLog
+						   for: aSpaceship
+						   withDeck:
+							   (OrderedCollection
+								    with: SpeedCard
+								    with: RedoCard
+								    with: RepeatCard
+								    with: CancellationCard)).
+
+	aBoard := self
+			  createBoardOf: 16
+			  distance: (ParsecDistance of: 1)
+			  withEffects: (nil)
+			  wormholeBeginsAt: 14
+			  andEndsAt: 15.
+
+	aDie := LoadedDie of: 3.
+	aGame := Game
+			 playedBy: spaceshipsData
+			 on: aBoard
+			 throwing: (OrderedCollection with: aDie)
+			 wonAfter: 3.
+
+	aSpeedCard := SpeedCard new.
+	aRedoCard := RedoCard new.
+	aRepeatCard := RepeatCard new.
+	aCancellationCard := CancellationCard new.
+
+	aGame play: aSpeedCard from: aSpaceship targeting: aSpaceship.
+	aGame play: aRedoCard from: aSpaceship targeting: aSpaceship.
+
+	self
+		should: [ aGame play: aCancellationCard from: aSpaceship targeting: aRedoCard ]
+		raise: Error
+		withMessage: 'Selected card is not active'.
+
+	self
+		should: [ aGame play: aCancellationCard from: aSpaceship targeting: aRepeatCard ]
+		raise: Error
+		withMessage: 'Selected card is not active'
+]
+
+{ #category : #tests }
+CardTest >> test132CancellationCardRemovesOnlyOneOfMultipleActiveSpeedCards [
+
+	| aGame aSpaceship aBoard aDie aFirstSpeedCard aSecondSpeedCard aCancellationCard spaceshipsData |
+	aSpaceship := Spaceship launch: 'One'.
+	spaceshipsData := OrderedCollection with:
+					  (SpaceshipLog
+						   for: aSpaceship
+						   withDeck:
+							   (OrderedCollection
+								    with: SpeedCard
+								    with: SpeedCard
+								    with: CancellationCard)).
+
+	aBoard := self
+			  createBoardOf: 16
+			  distance: (ParsecDistance of: 1)
+			  withEffects: (nil)
+			  wormholeBeginsAt: 14
+			  andEndsAt: 15.
+
+	aDie := LoadedDie of: 3.
+	aGame := Game
+			 playedBy: spaceshipsData
+			 on: aBoard
+			 throwing: (OrderedCollection with: aDie)
+			 wonAfter: 3.
+
+	aFirstSpeedCard := SpeedCard new.
+	aSecondSpeedCard := SpeedCard new.
+	aCancellationCard := CancellationCard new.
+
+	aGame play: aFirstSpeedCard from: aSpaceship targeting: aSpaceship.
+	aGame play: aSecondSpeedCard from: aSpaceship targeting: aSpaceship.
+	aGame play: aCancellationCard from: aSpaceship targeting: aFirstSpeedCard.
+	aGame playTurn.
+
+	self assert: (aGame positionOf: aSpaceship) equals: 5
+]

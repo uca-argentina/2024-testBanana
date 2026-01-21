@@ -42,13 +42,10 @@ HyperJumpEffect class >> isIn: aSquare movesDistance: someDistances [
 { #category : #action }
 HyperJumpEffect >> applyIn: aGame for: aSpaceship [
 
-	| currentDistance squaresToMove |
+	| currentDistance |
 	currentDistance := toMove removeFirst.
 	toMove addLast: currentDistance.
-	squaresToMove := aGame convertToSquares:  (currentDistance inParsecs) .
-	aGame make: aSpaceship  move: squaresToMove .
-	
-
+	aGame move: aSpaceship byParsecs: (currentDistance inParsecs).
 ]
 
 { #category : #initialization }
