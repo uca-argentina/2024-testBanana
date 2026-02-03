@@ -34,9 +34,7 @@ SequenceRandom >> nextInt: anInteger [
 
 { #category : #'as yet unclassified' }
 SequenceRandom >> nextInteger: anInteger [
-    index := index + 1.
-    index > values size ifTrue: [ self error: 'SequenceRandom exhausted' ].
-    ^ values at: index.
+    ^ self nextInt: anInteger
 
 
 ]
