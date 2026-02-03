@@ -2,7 +2,8 @@ Class {
 	#name : #Deck,
 	#superclass : #Object,
 	#instVars : [
-		'cards'
+		'cards',
+		'discard'
 	],
 	#classInstVars : [
 		'cards'
@@ -21,20 +22,54 @@ Deck class >> ofSize: aSize withProbabilities: someProbabilities using: aRandom 
     | cardClasses |
     cardClasses := OrderedCollection new.
     1 to: aSize do: [ :i |
-        cardClasses add: SpeedCard ].
+    cardClasses add: (self pickCardClassFrom: someProbabilities using: aRandom) ].
     ^ self new initializeWithCardClasses: cardClasses.
+
+]
+
+{ #category : #'as yet unclassified' }
+Deck class >> pickCardClassFrom: someProbabilities using: aRandom [
+
+    | roll cumulative |
+
+    roll := (aRandom respondsTo: #nextInt:)
+        ifTrue: [ aRandom nextInt: 100 ]
+        ifFalse: [ aRandom nextInteger: 100 ].
+
+    cumulative := 0.
+
+    someProbabilities associationsDo: [:assoc |
+        cumulative := cumulative + assoc value.
+        (roll <= cumulative) ifTrue: [ ^ assoc key ].
+    ].
+
+    Error signal: 'Invalid probabilities'
+
+
+
+]
+
+{ #category : #accessing }
+Deck >> discardSize [
+    ^ discard size
 
 ]
 
 { #category : #drawing }
 Deck >> draw [
-    ^ (cards removeFirst) new.
+    | cardClass |
+    cards isEmpty ifTrue: [ Error signal: 'Deck is empty' ].
+    cardClass := cards removeFirst.
+    discard add: cardClass.
+    ^ cardClass new
 
 ]
 
 { #category : #initialization }
 Deck >> initializeWithCardClasses: someCardClasses [
-    cards := someCardClasses.
+    cards := someCardClasses asOrderedCollection.
+    discard := OrderedCollection new.
+
 
 ]
 
