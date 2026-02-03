@@ -57,11 +57,18 @@ Deck >> discardSize [
 
 { #category : #drawing }
 Deck >> draw [
-    | cardClass |
-    cards isEmpty ifTrue: [ Error signal: 'Deck is empty' ].
+ 	 | cardClass |   
+	cards isEmpty ifTrue: [
+        discard isEmpty ifTrue: [
+            Error signal: 'Deck is empty'
+        ].
+        cards := discard shuffled.
+        discard := OrderedCollection new.
+    ].   
     cardClass := cards removeFirst.
     discard add: cardClass.
     ^ cardClass new
+
 
 ]
 

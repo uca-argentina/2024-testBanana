@@ -67,3 +67,19 @@ DeckTest >> test147DrawingACardReducesDeckAndAddsToDiscard [
     self assert: deck discardSize equals: 1.
 
 ]
+
+{ #category : #tests }
+DeckTest >> test148WhenDeckIsEmptyItShufflesDiscardAndContinuesDrawing [
+    | deck probabilities rng first second |
+    probabilities := Dictionary new
+        at: SpeedCard put: 100;
+        yourself.
+    rng := SequenceRandom withAll: (OrderedCollection with: 1).
+    deck := Deck ofSize: 1 withProbabilities: probabilities using: rng.
+    first := deck draw.
+    second := deck draw.
+    self assert: first class equals: SpeedCard.
+    self assert: second class equals: SpeedCard.
+    self assert: deck discardSize equals: 1.
+
+]
