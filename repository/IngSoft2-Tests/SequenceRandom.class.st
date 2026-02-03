@@ -26,7 +26,7 @@ SequenceRandom >> initializeWithAll: aCollection [
 { #category : #'as yet unclassified' }
 SequenceRandom >> nextInt: anInteger [
     index := index + 1.
-    index > values size ifTrue: [ index := values size ].
+    index > values size ifTrue: [ index := 1 ].
     ^ values at: index
 
 
