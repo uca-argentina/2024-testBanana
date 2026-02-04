@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cards',
-		'discard'
+		'discard',
+		'rng'
 	],
 	#classInstVars : [
 		'cards'
@@ -11,9 +12,9 @@ Class {
 	#category : #'IngSoft2-Tests'
 }
 
-{ #category : #'as yet unclassified' }
-Deck class >> initializeWithCardClasses: someCardClasses [
-    cards := someCardClasses.
+{ #category : #requirements }
+Deck class >> empty [
+    ^ self new initializeWithCardClasses: OrderedCollection new
 
 ]
 
@@ -21,9 +22,12 @@ Deck class >> initializeWithCardClasses: someCardClasses [
 Deck class >> ofSize: aSize withProbabilities: someProbabilities using: aRandom [
     | cardClasses |
     cardClasses := OrderedCollection new.
-    1 to: aSize do: [ :i |
-    cardClasses add: (self pickCardClassFrom: someProbabilities using: aRandom) ].
-    ^ self new initializeWithCardClasses: cardClasses.
+    1 to: aSize do: [:i |
+        cardClasses add: (self pickCardClassFrom: someProbabilities using: aRandom)
+    ].
+    ^ self new initializeWithCardClasses: cardClasses using: aRandom
+
+
 
 ]
 
@@ -57,14 +61,15 @@ Deck >> discardSize [
 
 { #category : #drawing }
 Deck >> draw [
- 	 | cardClass |   
-	cards isEmpty ifTrue: [
+    | cardClass |
+
+    cards isEmpty ifTrue: [
         discard isEmpty ifTrue: [
-            Error signal: 'Deck is empty'
+            Error signal: 'Deck has no cards available'
         ].
-        cards := discard shuffled.
-        discard := OrderedCollection new.
-    ].   
+        self shuffleDiscardIntoDeck.
+    ].
+
     cardClass := cards removeFirst.
     discard add: cardClass.
     ^ cardClass new
@@ -74,8 +79,17 @@ Deck >> draw [
 
 { #category : #initialization }
 Deck >> initializeWithCardClasses: someCardClasses [
+    cards := someCardClasses.
+    discard := OrderedCollection new.
+    ^ self
+
+]
+
+{ #category : #initialization }
+Deck >> initializeWithCardClasses: someCardClasses using: aRandom [
     cards := someCardClasses asOrderedCollection.
     discard := OrderedCollection new.
+    rng := aRandom.
 
 
 ]
@@ -85,6 +99,29 @@ Deck >> initializeWithSize: aSize [
     cards := OrderedCollection new.
     1 to: aSize do: [ :i |
         cards add: SpeedCard new ].
+
+]
+
+{ #category : #'as yet unclassified' }
+Deck >> shuffleDiscardIntoDeck [
+    | temp index roll |
+
+    temp := discard copy.
+    cards := OrderedCollection new.
+
+    [ temp isEmpty ] whileFalse: [
+
+        roll := (rng respondsTo: #nextInt:)
+            ifTrue: [ rng nextInt: 100 ]
+            ifFalse: [ rng nextInteger: 100 ].
+
+        index := (roll - 1 \\ temp size) + 1.
+
+        cards add: (temp removeAt: index).
+    ].
+
+    discard := OrderedCollection new.
+
 
 ]
 

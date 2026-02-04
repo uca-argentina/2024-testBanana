@@ -24,6 +24,14 @@ SequenceRandom >> initializeWithAll: aCollection [
 ]
 
 { #category : #'as yet unclassified' }
+SequenceRandom >> next [
+    "Devuelve un número entre 0 y 1 para shuffledBy:"
+    ^ (self nextInt: 100) / 100.0
+
+
+]
+
+{ #category : #'as yet unclassified' }
 SequenceRandom >> nextInt: anInteger [
     index := index + 1.
     index > values size ifTrue: [ index := 1 ].
