@@ -32,6 +32,7 @@ Class {
 	#instVars : [
 		'spaceship',
 		'shields',
+		'maxShields',
 		'position',
 		'state',
 		'cards'
@@ -124,12 +125,23 @@ SpaceshipLog >> hash [
 ^shields hash + position hash + spaceship hash 
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> increaseShieldByOne [
+
+	shields = maxShields ifTrue: [
+		maxShields := maxShields + 1 ].
+
+	shields := shields + 1.
+
+]
+
 { #category : #initialization }
 SpaceshipLog >> initializeFor: aSpaceship withDeck: someCards [
 
 	spaceship := aSpaceship .
 	state := NoPenaltyState new.
-	shields := 3.
+	maxShields := 3.
+	shields := maxShields.
 	cards:= OrderedCollection withAll:  someCards.
 ]
 
@@ -138,7 +150,8 @@ SpaceshipLog >> initializeRandomCardsFor: aSpaceship [
 
 	spaceship := aSpaceship .
 	state := NoPenaltyState new.
-	shields := 3.
+	maxShields := 3.
+	shields := maxShields.
 	cards:= OrderedCollection new.
 	2 timesRepeat: [ self addRandomCard].
 ]
@@ -174,7 +187,7 @@ SpaceshipLog >> position [
 { #category : #adding }
 SpaceshipLog >> rechargeShields [
 
-	shields := 3
+	shields := maxShields.
 ]
 
 { #category : #removing }

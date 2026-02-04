@@ -151,6 +151,12 @@ Game >> end [
 	state := GameFinishedState new.
 ]
 
+{ #category : #'as yet unclassified' }
+Game >> increaseShieldByOneOf: aSpaceship [
+    (self dataFor: aSpaceship) increaseShieldByOne.
+
+]
+
 { #category : #initialization }
 Game >> initializePlayedBy: someSpaceships on: aBoard throwing: someDice wonAfter: aNumberOfLaps [ 
 
