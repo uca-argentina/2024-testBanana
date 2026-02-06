@@ -10,7 +10,10 @@ Class {
 		'laps',
 		'activeCards',
 		'lastTypeOfCardPlayed',
-		'lastEffectTriggered'
+		'lastEffectTriggered',
+		'doubleTarget',
+		'lastRolls',
+		'spaceshipWithDouble'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -18,6 +21,12 @@ Class {
 { #category : #initialization }
 Game class >> playedBy: someSpaceships on: aBoard throwing: someDice wonAfter: aNumberOfLaps [ 
 	^self new initializePlayedBy: someSpaceships  on: aBoard  throwing: someDice wonAfter: aNumberOfLaps .
+]
+
+{ #category : #'as yet unclassified' }
+Game >> activateDoubleFor: aSpaceship [
+	spaceshipWithDouble := aSpaceship.
+
 ]
 
 { #category : #adding }
@@ -51,16 +60,39 @@ Game >> applyMoonwalkFor: aSpaceship  movingOthersBack: someSquares [
 { #category : #action }
 Game >> battleBetween: aSpaceship and: aSpaceship2 [
 
-	| loser resultForFirstPlayer resultForSecondPlayer |
+	| loser 
+	  resultForFirstPlayer resultForSecondPlayer
+	  firstLog secondLog |
+
+	firstLog := self dataFor: aSpaceship.
+	secondLog := self dataFor: aSpaceship2.
+
+	"Primer jugador"
 	resultForFirstPlayer := self throwDice.
-	activeCards  do: [ :card | resultForFirstPlayer := (card reinforce: aSpaceship in: self) + resultForFirstPlayer. ].
+	(firstLog consumeDoubleIfPresent) ifTrue: [
+		resultForFirstPlayer := resultForFirstPlayer * 2
+	].
+	activeCards do: [ :card |
+		resultForFirstPlayer := resultForFirstPlayer
+			+ (card reinforce: aSpaceship in: self)
+	].
+
+	"Segundo jugador"
 	resultForSecondPlayer := self throwDice.
-	activeCards  do: [ :card | resultForSecondPlayer := (card reinforce: aSpaceship2 in: self) + resultForSecondPlayer. ].
+	(secondLog consumeDoubleIfPresent) ifTrue: [
+		resultForSecondPlayer := resultForSecondPlayer * 2
+	].
+	activeCards do: [ :card |
+		resultForSecondPlayer := resultForSecondPlayer
+			+ (card reinforce: aSpaceship2 in: self)
+	].
 
 	loser := resultForFirstPlayer > resultForSecondPlayer
-		         ifTrue: [ aSpaceship2 ]
-		         ifFalse: [ aSpaceship ].
+		ifTrue: [ aSpaceship2 ]
+		ifFalse: [ aSpaceship ].
+
 	self reducePartyShieldsByOneOf: loser
+
 ]
 
 { #category : #action }
@@ -109,6 +141,13 @@ Game >> checkForWinner [
 	((self lapsOf: currentSpaceship  ) >= laps) ifTrue: [ self end  ]
 ]
 
+{ #category : #'as yet unclassified' }
+Game >> consumeDouble [
+	spaceshipWithDouble := nil.
+
+
+]
+
 { #category : #converting }
 Game >> convertToSquares: aParsecDistance [
 	^board convertToSquares: aParsecDistance
@@ -149,6 +188,13 @@ Game >> dice [
 { #category : #adding }
 Game >> end [
 	state := GameFinishedState new.
+]
+
+{ #category : #'as yet unclassified' }
+Game >> hasDoubleFor: aSpaceship [
+	^ spaceshipWithDouble = aSpaceship
+
+
 ]
 
 { #category : #'as yet unclassified' }
@@ -315,6 +361,12 @@ Game >> reducePartyShieldsByOneOf: loser [
 	(self dataFor: loser) decreaseShieldsByOne . 
 	(self dataFor: loser) moveTo: 1
 	
+]
+
+{ #category : #'as yet unclassified' }
+Game >> registerDoubleForNextBattleOf: aSpaceship [
+	doubleTarget := aSpaceship.
+
 ]
 
 { #category : #removing }

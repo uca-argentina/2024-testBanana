@@ -35,7 +35,8 @@ Class {
 		'maxShields',
 		'position',
 		'state',
-		'cards'
+		'cards',
+		'hasDoubleNextBattle'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -68,6 +69,11 @@ SpaceshipLog >> >= anotherSpaceship [
 		
 
 		
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> activateDoubleForNextBattle [
+	hasDoubleNextBattle := true.
 ]
 
 { #category : #adding }
@@ -113,6 +119,14 @@ SpaceshipLog >> changeStateTo: aState [
 state := aState 
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> consumeDoubleIfPresent [
+	| wasActive |
+	wasActive := hasDoubleNextBattle.
+	hasDoubleNextBattle := false.
+	^ wasActive
+]
+
 { #category : #adding }
 SpaceshipLog >> decreaseShieldsByOne [ 
 	shields := shields -1 max: 0.
@@ -143,6 +157,8 @@ SpaceshipLog >> initializeFor: aSpaceship withDeck: someCards [
 	maxShields := 3.
 	shields := maxShields.
 	cards:= OrderedCollection withAll:  someCards.
+	hasDoubleNextBattle := false.
+
 ]
 
 { #category : #initialization }
@@ -153,6 +169,7 @@ SpaceshipLog >> initializeRandomCardsFor: aSpaceship [
 	maxShields := 3.
 	shields := maxShields.
 	cards:= OrderedCollection new.
+	hasDoubleNextBattle := false.
 	2 timesRepeat: [ self addRandomCard].
 ]
 
