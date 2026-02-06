@@ -104,24 +104,18 @@ Deck >> initializeWithSize: aSize [
 
 { #category : #'as yet unclassified' }
 Deck >> shuffleDiscardIntoDeck [
-    | temp index roll |
+	| temp roll index |
 
-    temp := discard copy.
-    cards := OrderedCollection new.
+	temp := discard copy.
+	cards := OrderedCollection new.
 
-    [ temp isEmpty ] whileFalse: [
+	[ temp isEmpty ] whileFalse: [
+		roll := rng nextInt: temp size.
+		index := ((roll - 1) \\ temp size) + 1.
+		cards add: (temp removeAt: index)
+	].
 
-        roll := (rng respondsTo: #nextInt:)
-            ifTrue: [ rng nextInt: 100 ]
-            ifFalse: [ rng nextInteger: 100 ].
-
-        index := (roll - 1 \\ temp size) + 1.
-
-        cards add: (temp removeAt: index).
-    ].
-
-    discard := OrderedCollection new.
-
+	discard := OrderedCollection new.
 
 ]
 
