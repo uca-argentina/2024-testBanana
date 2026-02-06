@@ -75,6 +75,7 @@ Deck >> draw [
     ^ cardClass new
 
 
+
 ]
 
 { #category : #initialization }
@@ -98,7 +99,8 @@ Deck >> initializeWithCardClasses: someCardClasses using: aRandom [
 Deck >> initializeWithSize: aSize [
     cards := OrderedCollection new.
     1 to: aSize do: [ :i |
-        cards add: SpeedCard new ].
+        cards add: SpeedCard ].
+    discard := OrderedCollection new.
 
 ]
 
