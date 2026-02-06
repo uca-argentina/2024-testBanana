@@ -225,3 +225,98 @@ DoubleAndDefendCardTest >> test157DoubleIsConsumedAfterFirstBattleOnly [
 	self assert: (aGame shieldsOf: cSpaceship) equals: 3.
 
 ]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test158DoubleDoesNotAffectMovementRoll [
+
+	| aSpaceship bSpaceship spaceshipsData aBoard aGame aDie doubleCard |
+
+	"Arrange"
+	aSpaceship := Spaceship launch: 'A'.
+	bSpaceship := Spaceship launch: 'B'.
+
+	spaceshipsData := OrderedCollection with:
+		(SpaceshipLog for: aSpaceship withDeck: (OrderedCollection with: DoubleCard))
+		with: (SpaceshipLog for: bSpaceship withDeck: OrderedCollection new).
+
+	aBoard := self
+		createBoardOf: 5
+		distance: (ParsecDistance of: 1)
+		withEffects: nil
+		wormholeBeginsAt: 4
+		andEndsAt: 5.
+
+	"El dado siempre devuelve 2"
+	aDie := LoadedDie arrayOf: (OrderedCollection with: 2).
+
+	aGame := Game
+		playedBy: spaceshipsData
+		on: aBoard
+		throwing: (OrderedCollection with: aDie)
+		wonAfter: 5.
+
+	doubleCard := DoubleCard new.
+
+	"Se juega Double sobre A"
+	aGame play: doubleCard from: aSpaceship targeting: aSpaceship.
+
+	"Act: turno normal (movimiento)"
+	aGame turn.
+
+	"Assert: A se movió SOLO 2 (no 4)"
+	self assert: (aGame positionOf: aSpaceship) equals: 3.
+
+]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test159DoubleIsConsumedAfterFirstBattleOnly [
+
+	| aSpaceship bSpaceship cSpaceship spaceshipsData aBoard aGame aDie doubleCard |
+
+	"Arrange"
+	aSpaceship := Spaceship launch: 'A'.
+	bSpaceship := Spaceship launch: 'B'.
+	cSpaceship := Spaceship launch: 'C'.
+
+	spaceshipsData := OrderedCollection with:
+		(SpaceshipLog for: aSpaceship withDeck: (OrderedCollection with: DoubleCard))
+		with: (SpaceshipLog for: bSpaceship withDeck: OrderedCollection new)
+		with: (SpaceshipLog for: cSpaceship withDeck: OrderedCollection new).
+
+	"Tablero donde A pelea primero con B y luego con C"
+	aBoard := self
+		createBoardOf: 3
+		distance: (ParsecDistance of: 1)
+		withEffects: nil
+		wormholeBeginsAt: 2
+		andEndsAt: 3.
+
+	"Dado determinístico: siempre 2"
+	aDie := LoadedDie arrayOf: (OrderedCollection with: 2).
+
+	aGame := Game
+		playedBy: spaceshipsData
+		on: aBoard
+		throwing: (OrderedCollection with: aDie)
+		wonAfter: 5.
+
+	doubleCard := DoubleCard new.
+
+	"Se juega Double sobre A"
+	aGame play: doubleCard from: aSpaceship targeting: aSpaceship.
+
+	"Primera batalla: A vs B"
+	aGame battleBetween: aSpaceship and: bSpaceship.
+
+	"Segunda batalla: A vs C"
+	aGame battleBetween: aSpaceship and: cSpaceship.
+
+	"Assert:
+	- En la primera, A duplica (4 vs 2) → pierde B
+	- En la segunda, A NO duplica (2 vs 2) → pierde A"
+
+	self assert: (aGame shieldsOf: bSpaceship) equals: 2.
+	self assert: (aGame shieldsOf: aSpaceship) equals: 2.
+
+
+]
