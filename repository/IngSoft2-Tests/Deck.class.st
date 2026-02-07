@@ -19,6 +19,14 @@ Deck class >> empty [
 ]
 
 { #category : #'as yet unclassified' }
+Deck class >> normalizedProbabilitiesFrom: someProbabilities [
+    (someProbabilities respondsTo: #associations)
+        ifTrue: [ ^ someProbabilities associations asOrderedCollection ].
+
+    ^ someProbabilities asOrderedCollection
+]
+
+{ #category : #'as yet unclassified' }
 Deck class >> ofSize: aSize withProbabilities: someProbabilities using: aRandom [
     | cardClasses |
     cardClasses := OrderedCollection new.
@@ -33,21 +41,21 @@ Deck class >> ofSize: aSize withProbabilities: someProbabilities using: aRandom 
 
 { #category : #'as yet unclassified' }
 Deck class >> pickCardClassFrom: someProbabilities using: aRandom [
-	| roll cumulative |
+    | roll cumulative ordered |
 
-	roll := (aRandom respondsTo: #nextInt:)
-		ifTrue: [ aRandom nextInt: 100 ]
-		ifFalse: [ aRandom nextInteger: 100 ].
+    roll := (aRandom respondsTo: #nextInt:)
+        ifTrue: [ aRandom nextInt: 100 ]
+        ifFalse: [ aRandom nextInteger: 100 ].
 
-	cumulative := 0.
+    cumulative := 0.
+    ordered := self normalizedProbabilitiesFrom: someProbabilities.
 
-	someProbabilities associationsDo: [:assoc |
-		cumulative := cumulative + assoc value.
-		(roll <= cumulative) ifTrue: [ ^ assoc key ].
-	].
+    ordered do: [:assoc |
+        cumulative := cumulative + assoc value.
+        (roll <= cumulative) ifTrue: [ ^ assoc key ].
+    ].
 
-	Error signal: 'Invalid probabilities'
-
+    Error signal: 'Invalid probabilities'
 
 
 ]
@@ -104,27 +112,30 @@ Deck >> initializeWithSize: aSize [
 ]
 
 { #category : #'as yet unclassified' }
+Deck >> normalizedProbabilitiesFrom: someProbabilities [
+    (someProbabilities respondsTo: #associations)
+        ifTrue: [ ^ someProbabilities associations asOrderedCollection ].
+
+    ^ someProbabilities asOrderedCollection
+
+]
+
+{ #category : #'as yet unclassified' }
 Deck >> shuffleDiscardIntoDeck [
-	| temp roll startIndex size |
+    | temp roll index |
 
-	temp := discard copy.
-	cards := OrderedCollection new.
-	size := temp size.
+    temp := discard copy.
+    cards := OrderedCollection new.
+    discard := OrderedCollection new.
 
-	roll := (rng respondsTo: #nextInt:)
-		ifTrue: [ rng nextInt: size ]
-		ifFalse: [ rng nextInteger: size ].
+    [ temp notEmpty ] whileTrue: [
+        roll := (rng respondsTo: #nextInt:)
+            ifTrue: [ rng nextInt: 100 ]
+            ifFalse: [ rng nextInteger: 100 ].
 
-	"Normalizamos roll al rango 1..size SIN min/max"
-	roll <= 0 ifTrue: [ startIndex := 1 ].
-	roll > size ifTrue: [ startIndex := ((roll - 1) \\ size) + 1 ].
-	(roll > 0 and: [ roll <= size ]) ifTrue: [ startIndex := roll ].
-
-	1 to: size do: [ :i |
-		cards add: (temp at: (((startIndex - 1 + i - 1) \\ size) + 1))
-	].
-
-	discard := OrderedCollection new.
+        index := ((roll - 1) \\ temp size) + 1.
+        cards add: (temp removeAt: index).
+    ].
 
 ]
 
