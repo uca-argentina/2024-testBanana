@@ -23,8 +23,8 @@ AccelerationCard >> mercenary [
 
 { #category : #playing }
 AccelerationCard >> playOn: aSpaceship [
+	^ 1
 
-^1
 ]
 
 { #category : #action }
