@@ -37,3 +37,19 @@ NullEffectTest >> test167NullEffectDoesNothingWhenApplied [
 
 
 ]
+
+{ #category : #tests }
+NullEffectTest >> test172NullEffectDoesNotChangePosition [
+	| game spaceship effect initial |
+
+	spaceship := Spaceship launch: 'A'.
+	game := self gameWithOnly: spaceship.
+
+	effect := NullEffect isIn: 3.
+	initial := game positionOf: spaceship.
+
+	effect applyIn: game for: spaceship.
+
+	self assert: (game positionOf: spaceship) equals: initial.
+
+]

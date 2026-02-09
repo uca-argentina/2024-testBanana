@@ -59,3 +59,29 @@ SpeedCardTest >> test169SpeedDoublesMovementRoll [
 		equals: initialPosition + 3.
 
 ]
+
+{ #category : #tests }
+SpeedCardTest >> test170SpeedDoesNotApplyWhenTargetIsDifferent [
+	| game spaceship card die initial |
+
+	spaceship := Spaceship launch: 'A'.
+	die := LoadedDie arrayOf: (OrderedCollection with: 2).
+
+	game := self
+		gameWithOnly: spaceship
+		throwing: (OrderedCollection with: die).
+
+	card := SpeedCard new.
+	(game dataFor: spaceship) addCardToHand: SpeedCard.
+
+	initial := game positionOf: spaceship.
+
+	"Target distinto (nil o cualquier otro objeto)"
+	game play: card from: spaceship targeting: nil.
+	game turn.
+
+	self assert: (game positionOf: spaceship)
+		equals: initial + 2.
+
+
+]

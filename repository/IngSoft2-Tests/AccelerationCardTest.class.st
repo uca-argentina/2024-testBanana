@@ -81,3 +81,29 @@ AccelerationCardTest >> test169AccelerationDoesNotAffectBattleRoll [
 
 
 ]
+
+{ #category : #tests }
+AccelerationCardTest >> test171AccelerationStacksIfPlayedTwice [
+	| game spaceship die card initial |
+
+	spaceship := Spaceship launch: 'A'.
+	die := LoadedDie arrayOf: (OrderedCollection with: 1).
+
+	game := self
+		gameWithOnly: spaceship
+		throwing: (OrderedCollection with: die).
+
+	card := AccelerationCard new.
+	(game dataFor: spaceship) addCardToHand: AccelerationCard.
+	(game dataFor: spaceship) addCardToHand: AccelerationCard.
+
+	initial := game positionOf: spaceship.
+
+	game play: card from: spaceship targeting: spaceship.
+	game play: card from: spaceship targeting: spaceship.
+	game turn.
+
+	self assert: (game positionOf: spaceship)
+		equals: initial + 1 + 2.
+
+]
