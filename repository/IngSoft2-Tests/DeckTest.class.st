@@ -174,3 +174,44 @@ DeckTest >> test152RefillRespectsInjectedRandomOrder [
 
 
 ]
+
+{ #category : #tests }
+DeckTest >> test161DrawFailsWhenDeckAndDiscardAreEmpty [
+    | deck |
+
+    deck := Deck new initializeWithCardClasses: OrderedCollection new.
+
+    self
+        should: [ deck draw ]
+        raise: Error.
+
+
+
+]
+
+{ #category : #tests }
+DeckTest >> test162DrawRefillsDeckFromDiscard [
+    | deck probabilities rng first second third |
+
+    probabilities := Dictionary new
+        at: SpeedCard put: 100;
+        yourself.
+
+    rng := SequenceRandom withAll: (OrderedCollection with: 1).
+
+    deck := Deck ofSize: 2 withProbabilities: probabilities using: rng.
+
+    first := deck draw.
+    second := deck draw.
+
+    "Deck vacío, discard tiene 2 cartas"
+    self assert: deck size equals: 0.
+    self assert: deck discardSize equals: 2.
+
+    third := deck draw.
+
+    self assert: third class equals: SpeedCard.
+    self assert: deck discardSize equals: 1.
+
+
+]

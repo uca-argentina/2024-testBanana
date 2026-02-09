@@ -83,6 +83,12 @@ cards add: aCard .
 ]
 
 { #category : #adding }
+SpaceshipLog >> addCardToHand: aCardClass [
+	cards add: aCardClass
+
+]
+
+{ #category : #adding }
 SpaceshipLog >> addRandomCard [
 
 	| cardTypes randomCard |

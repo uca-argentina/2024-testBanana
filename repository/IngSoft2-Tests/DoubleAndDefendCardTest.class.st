@@ -4,6 +4,56 @@ Class {
 	#category : #'IngSoft2-Tests'
 }
 
+{ #category : #'as yet unclassified' }
+DoubleAndDefendCardTest >> gameWithOnly: aSpaceship [
+	| spaceshipsData board die |
+
+	spaceshipsData := OrderedCollection with:
+		(SpaceshipLog for: aSpaceship withDeck: OrderedCollection new).
+
+	board := self
+		createBoardOf: 4
+		distance: (ParsecDistance of: 1)
+		withEffects: nil
+		wormholeBeginsAt: 3
+		andEndsAt: 4.
+
+	die := LoadedDie of: 3.
+
+	^ Game
+		playedBy: spaceshipsData
+		on: board
+		throwing: (OrderedCollection with: die)
+		wonAfter: 3.
+
+]
+
+{ #category : #'as yet unclassified' }
+DoubleAndDefendCardTest >> gameWithOnly: aSpaceship and: anotherSpaceship [
+	| spaceshipsData board die |
+
+	spaceshipsData := OrderedCollection with:
+		(SpaceshipLog for: aSpaceship withDeck: OrderedCollection new)
+		with:
+		(SpaceshipLog for: anotherSpaceship withDeck: OrderedCollection new).
+
+	board := self
+		createBoardOf: 4
+		distance: (ParsecDistance of: 1)
+		withEffects: nil
+		wormholeBeginsAt: 3
+		andEndsAt: 4.
+
+	die := LoadedDie of: 3.
+
+	^ Game
+		playedBy: spaceshipsData
+		on: board
+		throwing: (OrderedCollection with: die)
+		wonAfter: 3.
+
+]
+
 { #category : #tests }
 DoubleAndDefendCardTest >> test153DefendIncreasesShieldsByOneWhenNotFull [
 
@@ -317,6 +367,132 @@ DoubleAndDefendCardTest >> test159DoubleIsConsumedAfterFirstBattleOnly [
 
 	self assert: (aGame shieldsOf: bSpaceship) equals: 2.
 	self assert: (aGame shieldsOf: aSpaceship) equals: 2.
+
+
+]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test160DoubleReinforceDoesNothingIfNoDoubleActive [
+    | spaceship spaceshipsData board game card die |
+
+    spaceship := Spaceship launch: 'A'.
+
+    spaceshipsData := OrderedCollection with:
+        (SpaceshipLog for: spaceship withDeck: OrderedCollection new).
+
+    board := self
+        createBoardOf: 4
+        distance: (ParsecDistance of: 1)
+        withEffects: nil
+        wormholeBeginsAt: 3
+        andEndsAt: 4.
+
+    die := LoadedDie of: 3.
+
+    game := Game
+        playedBy: spaceshipsData
+        on: board
+        throwing: (OrderedCollection with: die)
+        wonAfter: 1.
+
+    card := DoubleCard new.
+
+    self assert: (card reinforce: spaceship in: game) equals: 0.
+
+
+]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test163DoubleAddsExtraBattleRollOnce [
+    | aSpaceship bSpaceship spaceshipsData board die game card |
+
+    aSpaceship := Spaceship launch: 'A'.
+    bSpaceship := Spaceship launch: 'B'.
+
+    spaceshipsData := OrderedCollection with:
+        (SpaceshipLog for: aSpaceship withDeck: (OrderedCollection with: DoubleCard))
+        with:
+        (SpaceshipLog for: bSpaceship withDeck: OrderedCollection new).
+
+    board := self
+        createBoardOf: 3
+        distance: (ParsecDistance of: 1)
+        withEffects: nil
+        wormholeBeginsAt: 2
+        andEndsAt: 3.
+
+    die := LoadedDie arrayOf: (OrderedCollection with: 2).
+
+    game := Game
+        playedBy: spaceshipsData
+        on: board
+        throwing: (OrderedCollection with: die)
+        wonAfter: 1.
+
+    card := DoubleCard new.
+
+    game play: card from: aSpaceship targeting: aSpaceship.
+    game battleBetween: aSpaceship and: bSpaceship.
+
+    self assert: (game shieldsOf: bSpaceship) equals: 2.
+
+
+
+]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test164DoubleReinforceReturnsZeroWhenNotActivated [
+	| game spaceship card result |
+
+	spaceship := Spaceship launch: 'A'.
+	game := self gameWithOnly: spaceship.
+
+	card := DoubleCard new.
+
+	"IMPORTANTE: la carta debe estar en la mano"
+	(game dataFor: spaceship) addCardToHand: DoubleCard.
+
+	result := card reinforce: spaceship in: game.
+
+	self assert: result equals: 0.
+
+
+
+
+]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test165DefendDoesNotBreakWhenPlayedCorrectly [
+	| game spaceship card initialShields |
+
+	spaceship := Spaceship launch: 'A'.
+	game := self gameWithOnly: spaceship.
+
+	card := DefendCard new.
+	initialShields := game shieldsOf: spaceship.
+
+	(game dataFor: spaceship) addCardToHand: DefendCard.
+
+	game play: card from: spaceship targeting: spaceship.
+
+	self assert: (game shieldsOf: spaceship) >= initialShields.
+
+
+
+
+]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test166CannotDrawWhenDeckAndDiscardAreEmpty [
+	| deck |
+
+	deck := Deck ofSize: 0 withProbabilities: Dictionary new using: Random new.
+
+	self
+		should: [ deck draw ]
+		raise: Error
+		withMessage: 'Deck has no cards available'.
+
 
 
 ]
