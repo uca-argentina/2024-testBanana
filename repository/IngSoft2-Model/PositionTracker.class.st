@@ -50,18 +50,26 @@ PositionTracker >> initializeBeginIn: aBoard [
 
 { #category : #accessing }
 PositionTracker >> laps [
-	^board lapsAfterMoving: totalSquaresMoved 
+	| length |
+	length := board lengthInSquares.
+	^ totalSquaresMoved // length
 ]
 
-{ #category : #arithmetic }
+{ #category : #accessing }
 PositionTracker >> move: someSquares [
-
-totalSquaresMoved := totalSquaresMoved +someSquares max: 0
+	someSquares isInteger ifFalse: [ self error: 'MOVE NOT INTEGER' ].
+	totalSquaresMoved := (totalSquaresMoved + someSquares) max: 0.
 ]
 
 { #category : #action }
 PositionTracker >> moveTo: aSquare [
  	self move: (aSquare - self square )
+]
+
+{ #category : #initialization }
+PositionTracker >> reset [
+	totalSquaresMoved := 0.
+
 ]
 
 { #category : #accessing }

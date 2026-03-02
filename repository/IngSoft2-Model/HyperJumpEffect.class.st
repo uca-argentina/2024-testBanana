@@ -29,7 +29,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'toMove',
-		'myPosition'
+		'myPosition',
+		'square'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -41,27 +42,32 @@ HyperJumpEffect class >> isIn: aSquare movesDistance: someDistances [
 
 { #category : #action }
 HyperJumpEffect >> applyIn: aGame for: aSpaceship [
-
 	| currentDistance |
 	currentDistance := toMove removeFirst.
 	toMove addLast: currentDistance.
-	aGame move: aSpaceship byParsecs: (currentDistance inParsecs).
+	aGame move: aSpaceship byParsecs: currentDistance.
 ]
 
 { #category : #initialization }
 HyperJumpEffect >> initializeIsIn: aSquare movesDistance: someDistance [
 
 	myPosition := aSquare.
-	toMove  := someDistance .
+	toMove := someDistance copy.
+
+	^ self
 ]
 
 { #category : #accessing }
 HyperJumpEffect >> position [
-
-^myPosition 
+	^ myPosition
 ]
 
 { #category : #initialization }
 HyperJumpEffect >> setPosition: aPosition [
 myPosition := aPosition.
+]
+
+{ #category : #accessing }
+HyperJumpEffect >> square [
+	^ self position
 ]

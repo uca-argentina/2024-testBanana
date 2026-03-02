@@ -8,25 +8,43 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #accessing }
+MercenaryCard >> ally [
+	^ ally
+]
+
 { #category : #action }
 MercenaryCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 	self validateIfCardCanBePlayedBy: aSpaceship in: aGame.
-	self validateAllianceBetween: aSpaceship and: anotherSpaceship .
-	aGame validateMercenaryAvailability: anotherSpaceship .
-	mercenary:=anotherSpaceship.
+	self validateAllianceBetween: aSpaceship and: anotherSpaceship.
+
+	aGame validateMercenaryAvailability: anotherSpaceship.
+
+	mercenary := anotherSpaceship.
 	ally := aSpaceship.
+
 	aGame addActiveCard: self.
 ]
 
 { #category : #testing }
 MercenaryCard >> is: aSpaceship anAllyOf: anotherSpaceship [
+	^ ((aSpaceship == ally) and: [ anotherSpaceship == mercenary ])
+		or: [ (aSpaceship == mercenary) and: [ anotherSpaceship == ally ] ]
+]
 
-^((aSpaceship = ally) and: anotherSpaceship = mercenary) or: ((aSpaceship = mercenary ) and: anotherSpaceship = ally)
+{ #category : #validation }
+MercenaryCard >> isAlly: aSpaceship [
+	^ ally == aSpaceship
+]
+
+{ #category : #validation }
+MercenaryCard >> isMercenary: aSpaceship [
+	^ mercenary == aSpaceship
 ]
 
 { #category : #accessing }
 MercenaryCard >> mercenary [
-^mercenary
+	^ mercenary
 ]
 
 { #category : #playing }
@@ -51,5 +69,12 @@ aSpaceship = ally ifTrue: [ ^aGame throwDice ].
 
 { #category : #validation }
 MercenaryCard >> validateAllianceBetween: aSpaceship and: anotherSpaceship [
-	aSpaceship = anotherSpaceship ifTrue: [ Error signal: 'A spaceship cannot be its own mercenary' ]
+	(aSpaceship == anotherSpaceship)
+		ifTrue: [ Error signal: 'A spaceship cannot be its own mercenary' ].
+]
+
+{ #category : #validation }
+MercenaryCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+	(aGame nextSpaceshipToPlay == aSpaceship)
+		ifFalse: [ Error signal: 'Card cannot be played out of turn' ].
 ]

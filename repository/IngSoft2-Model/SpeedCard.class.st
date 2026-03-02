@@ -27,15 +27,22 @@ Class {
 	#name : #SpeedCard,
 	#superclass : #PermanentCard,
 	#instVars : [
-		'target'
+		'target',
+		'owner',
+		'affectedSpaceship'
 	],
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #accessing }
+SpeedCard >> affectedSpaceship [
+	^ affectedSpaceship
+]
+
 { #category : #action }
 SpeedCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 	self validateIfCardCanBePlayedBy: aSpaceship in: aGame.
-	target := anotherSpaceship .
+	affectedSpaceship := anotherSpaceship.
 	aGame addActiveCard: self.
 ]
 
@@ -48,6 +55,11 @@ SpeedCard >> is: aSpaceship anAllyOf: anotherSpaceship [
 { #category : #accessing }
 SpeedCard >> mercenary [
 ^0
+]
+
+{ #category : #accessing }
+SpeedCard >> owner [
+	^ owner
 ]
 
 { #category : #playing }
@@ -70,4 +82,10 @@ SpeedCard >> reinforce: aSpaceship in: aGame [
 
 { #category : #validation }
 SpeedCard >> validateAllianceBetween: aSpaceship and: anotherSpaceship [
+]
+
+{ #category : #validation }
+SpeedCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+	(aGame nextSpaceshipToPlay == aSpaceship)
+		ifFalse: [ Error signal: 'Card cannot be played out of turn' ].
 ]

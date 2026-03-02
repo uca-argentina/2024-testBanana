@@ -23,13 +23,26 @@ Internal Representation and Key Implementation Points.
 Class {
 	#name : #GameFinishedState,
 	#superclass : #Object,
+	#instVars : [
+		'spaceshipsData'
+	],
 	#category : #'IngSoft2-Model'
 }
 
-{ #category : #testing }
-GameFinishedState >> isOngoing [ 
+{ #category : #'instance creation' }
+GameFinishedState class >> with: someSpaceshipsData [
+	^ self new initializeWith: someSpaceshipsData
+]
 
-^ false
+{ #category : #initialization }
+GameFinishedState >> initializeWith: someSpaceshipsData [
+	spaceshipsData := someSpaceshipsData.
+	^ self
+]
+
+{ #category : #testing }
+GameFinishedState >> isOngoing [
+	^ false
 ]
 
 { #category : #validation }
@@ -39,16 +52,17 @@ Error signal: 'Cards cannot be played after game is over'
 ]
 
 { #category : #analyzing }
-GameFinishedState >> validateTurn [ 
-
+GameFinishedState >> validateTurn [
 	Error signal: 'Game has already ended'.
 ]
 
 { #category : #accessing }
-GameFinishedState >> winnerOf: spaceshipsData after: someLaps [
+GameFinishedState >> winnerOf: someSpaceshipsData after: someLaps [
 
 	| dataForWinner |
-	dataForWinner := spaceshipsData detect: [ :dataForASpaceship |
-		                 dataForASpaceship laps = someLaps ].
+	dataForWinner := someSpaceshipsData
+		detect: [ :data | data laps >= someLaps ]
+		ifNone: [ NotFound signal ].
+
 	^ dataForWinner spaceship
 ]

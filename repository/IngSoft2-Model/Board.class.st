@@ -94,17 +94,25 @@ Board class >> with: theSquares length: aDistance wormholeBeginsAt: startPoint a
 { #category : #accessing }
 Board >> applyEffectFor: aSpaceship afterMovingTo: aSquare whenPlaying: aGame [
 
-	| squareToLand |
-	squareToLand := boardOfSquares at: aSquare  .
-	 squareToLand land: aSpaceship in: aGame.
+	| effectToApply |
+
+	aSquare isInteger ifFalse: [
+		self error: 'NOT INTEGER POSITION: ', aSquare class name
+	].
+
+	effectToApply := (boardOfSquares collect: [:sq | sq effect ])
+		detect: [:anEffect | anEffect position = aSquare ]
+		ifNone: [ NullEffect isIn: aSquare ].
+
+	aGame saveLastEffectTriggeredTo: effectToApply.
+	^ effectToApply applyIn: aGame for: aSpaceship
 
 
 ]
 
 { #category : #converting }
-Board >> convertToSquares: aParsecDistance [
-
-^ aParsecDistance * self lengthInSquares // (parsecs inParsecs) 
+Board >> convertToSquares: aDistance [
+	^ (aDistance inParsecs) * self lengthInSquares // (parsecs inParsecs)
 ]
 
 { #category : #initialization }
@@ -125,8 +133,8 @@ Board >> initializeWith: theSquares length: aDistance wormholeBeginsAt: starting
 
 { #category : #converting }
 Board >> lapsAfterMoving: totalSquaresMoved [
-
-	^totalSquaresMoved // self lengthInSquares 
+	
+	^ totalSquaresMoved // self lengthInSquares
 ]
 
 { #category : #accessing }
@@ -149,5 +157,12 @@ Board >> lengthInSquares [
 { #category : #converting }
 Board >> squareNumberAfterMoving: anAmountOfSquares [
 
-	^anAmountOfSquares % self lengthInSquares +1
+	| length result |
+	length := self lengthInSquares.
+	result := anAmountOfSquares \\ length.
+	result < 0 ifTrue: [ result := result + length ].
+	^ result + 1
+
+
+
 ]

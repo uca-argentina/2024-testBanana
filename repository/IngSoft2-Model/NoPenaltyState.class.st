@@ -23,11 +23,31 @@ Internal Representation and Key Implementation Points.
 Class {
 	#name : #NoPenaltyState,
 	#superclass : #Object,
+	#instVars : [
+		'spaceship'
+	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #action }
+NoPenaltyState >> playFor: aLog in: aGame [
+    aGame turnFor: aLog spaceship.
+
+
+]
+
+{ #category : #action }
 NoPenaltyState >> playIn: aGame [
 
-	aGame turn .
+	aGame turnFor: spaceship
+
+]
+
+{ #category : #action }
+NoPenaltyState >> playTurnFor: aLog in: aGame [
+
+	| movement |
+	movement := aGame throwDice.
+	aLog moveBy: movement in: aGame.
+
 ]

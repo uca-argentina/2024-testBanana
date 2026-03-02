@@ -27,10 +27,19 @@ Class {
 }
 
 { #category : #action }
+Turn2RechargeState >> playFor: aLog in: aGame [
+    aLog rechargeShields.
+    aLog changeStateTo: NoPenaltyState new.
+
+
+]
+
+{ #category : #action }
 Turn2RechargeState >> playIn: aGame [
-	
-	|aSpaceship|
-	aSpaceship := aGame nextSpaceshipToPlay .
-	aGame rechargeShieldsOf: aSpaceship .
-	aGame changeStateOf: aSpaceship  to: (NoPenaltyState new).
+
+    | aSpaceship |
+    aSpaceship := aGame nextSpaceshipToPlay.
+    aGame rechargeShieldsOf: aSpaceship.
+    aGame changeStateOf: aSpaceship to: (NoPenaltyState new).
+
 ]

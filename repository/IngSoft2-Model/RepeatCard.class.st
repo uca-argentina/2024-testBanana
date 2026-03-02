@@ -26,6 +26,16 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #'as yet unclassified' }
+RepeatCard class >> cardType [
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+RepeatCard >> cardType [
+	^ RepeatCard
+]
+
 { #category : #action }
 RepeatCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 	aGame repeatLastEffectFor: anotherSpaceship  

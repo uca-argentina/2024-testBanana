@@ -30,3 +30,8 @@ Class {
 CancellationCard >> from: aSpaceship withTarget: aCard useIn: aGame [ 
 	aGame removeActiveCard: aCard.
 ]
+
+{ #category : #validation }
+CancellationCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+	^ self
+]

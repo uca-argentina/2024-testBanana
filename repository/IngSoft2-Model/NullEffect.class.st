@@ -40,6 +40,7 @@ NullEffect class >> isIn: aPosition [
 
 { #category : #action }
 NullEffect >> applyIn: aGame for: aSpaceship [
+	^ self
 
 ]
 

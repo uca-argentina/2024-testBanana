@@ -6,34 +6,54 @@ Class {
 
 { #category : #tests }
 NullEffectTest >> gameWithOnly: aSpaceship [
-	| board dice log |
+	| board dice deck probabilities |
 
 	board := Board of: 10 wormholeBeginsAt: 3 andEndsAt: 7.
 	dice := { LoadedDie of: 6 }.
 
-	log := SpaceshipLog new.
-	log initializeFor: aSpaceship withDeck: OrderedCollection new.
+	probabilities := OrderedCollection with: (AccelerationCard -> 100).
+
+	deck := Deck
+		ofSize: 10
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
 
 	^ Game
-		playedBy: (OrderedCollection with: log)
+		playedBy: (OrderedCollection with: aSpaceship)
 		on: board
 		throwing: dice
 		wonAfter: 1
+		usingDeck: deck.
 
 
 ]
 
 { #category : #tests }
 NullEffectTest >> test167NullEffectDoesNothingWhenApplied [
-	| game spaceship effect |
+	| game spaceship effect deck probabilities board |
 
 	spaceship := Spaceship launch: 'A'.
-	game := self gameWithOnly: spaceship.
-	effect := NullEffect isIn: 3.
 
+	board := Board of: 100 wormholeBeginsAt: 50 andEndsAt: 80.
+
+	probabilities := OrderedCollection with: (AccelerationCard -> 100).
+	deck := Deck
+		ofSize: 10
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
+
+	game := Game
+		playedBy: (OrderedCollection with: spaceship)
+		on: board
+		throwing: OrderedCollection new
+		wonAfter: 1
+		usingDeck: deck.
+
+	effect := NullEffect isIn: 3.
 	effect applyIn: game for: spaceship.
 
 	self assert: (game positionOf: spaceship) equals: 1.
+
 
 
 ]

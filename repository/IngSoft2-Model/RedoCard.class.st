@@ -26,7 +26,22 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #'as yet unclassified' }
+RedoCard class >> cardType [
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+RedoCard >> cardType [
+	^ RedoCard
+]
+
 { #category : #action }
 RedoCard >> from: aSpaceship withTarget: aTarget useIn: aGame [
 	aGame redoLastCardPlayedFor: aSpaceship withTarget: aTarget
+]
+
+{ #category : #validation }
+RedoCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+	^ self
 ]

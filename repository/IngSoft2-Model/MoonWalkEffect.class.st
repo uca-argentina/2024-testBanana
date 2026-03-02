@@ -53,14 +53,21 @@ MoonWalkEffect >> applyIn: aGame for: aSpaceship [
 ]
 
 { #category : #initialization }
-MoonWalkEffect >> initializeIsIn: aSquare moves: aNumberOfSquares [ 
-	someSquares  := aNumberOfSquares .
-	myPosition := aSquare 
+MoonWalkEffect >> initializeIsIn: aSquare moves: aNumberOfSquares [
+
+	myPosition := aSquare.
+	someSquares := aNumberOfSquares.
+
+	^ self
 ]
 
 { #category : #accessing }
 MoonWalkEffect >> position [
+	^ myPosition
 
-^myPosition 
+]
 
+{ #category : #action }
+MoonWalkEffect >> square [
+	^ self position
 ]

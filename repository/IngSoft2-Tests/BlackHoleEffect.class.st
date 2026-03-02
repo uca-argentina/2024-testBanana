@@ -6,7 +6,7 @@ Class {
 
 { #category : #tests }
 BlackHoleEffect >> test174BlackHoleSendsSpaceshipToBeginning [
-	| game spaceship die board squares initialShields |
+	| game spaceship die board squares initialShields deck probabilities |
 
 	spaceship := Spaceship launch: 'A'.
 	die := LoadedDie arrayOf: (OrderedCollection with: 1).
@@ -20,22 +20,28 @@ BlackHoleEffect >> test174BlackHoleSendsSpaceshipToBeginning [
 	board := Board
 		with: squares
 		length: 1
-		wormholeBeginsAt: 3
-		andEndsAt: 4.
+		wormholeBeginsAt: 5
+		andEndsAt: 9.
+
+	probabilities := OrderedCollection with: (AccelerationCard -> 100).
+	deck := Deck
+		ofSize: 10
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
 
 	game := Game
-		playedBy: (OrderedCollection with:
-			(SpaceshipLog new initializeFor: spaceship withDeck: OrderedCollection new))
+		playedBy: (OrderedCollection with: spaceship)
 		on: board
 		throwing: (OrderedCollection with: die)
-		wonAfter: 1.
+		wonAfter: 1
+		usingDeck: deck.
 
 	initialShields := game shieldsOf: spaceship.
 
-	"1 → 2 cae en BlackHole"
 	game turn.
 
 	self assert: (game positionOf: spaceship) equals: 1.
 	self assert: (game shieldsOf: spaceship) equals: initialShields.
+
 
 ]

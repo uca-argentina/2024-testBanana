@@ -69,32 +69,49 @@ GameTest >> test003GameBeginsWithAPlayer [
 
 	| aGame aSpaceship spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) .
-	aBoard := self createBoardOf: 4 distance: (ParsecDistance of: 2)  withEffects: {  }  wormholeBeginsAt: 2 andEndsAt: 3.
+	spaceshipsData := OrderedCollection with: aSpaceship.
+	aBoard := self 
+		createBoardOf: 4 
+		distance: (ParsecDistance of: 2)  
+		withEffects: { }  
+		wormholeBeginsAt: 2 
+		andEndsAt: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard 
 		         throwing: nil
 		         wonAfter: 1.
+
 	self
 		assert: aGame players
 		equals: (OrderedCollection with: aSpaceship)
+
 ]
 
 { #category : #tests }
 GameTest >> test004SpaceshipChangedPositionByOneWhenMoved [
 
-	| aSpaceship aGame spaceshipsData aBoard|
+	| aSpaceship aGame spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) .
-	aBoard := self createBoardOf: 5 distance: 5 withEffects: {  }  wormholeBeginsAt: 3 andEndsAt: 4.
+	spaceshipsData := OrderedCollection with: aSpaceship.
+	aBoard := self 
+		createBoardOf: 5 
+		distance: 5 
+		withEffects: { }  
+		wormholeBeginsAt: 3 
+		andEndsAt: 4.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard 
 		         throwing: nil
 		         wonAfter: 1.
+
 	aGame move: aSpaceship to: 1.
+
 	self assert: (aGame positionOf: aSpaceship) equals: 1
+
 ]
 
 { #category : #tests }
@@ -102,8 +119,14 @@ GameTest >> test005SpaceshipIsCreatedAtStartPoint [
 
 	| aSpaceship aGame spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) .
-	aBoard := self createBoardOf: 4 distance: (ParsecDistance of: 2)  withEffects: {  }  wormholeBeginsAt: 2 andEndsAt: 3.
+	spaceshipsData := OrderedCollection with: aSpaceship.
+	aBoard := self 
+		createBoardOf: 4 
+		distance: (ParsecDistance of: 2)  
+		withEffects: { }  
+		wormholeBeginsAt: 2 
+		andEndsAt: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard 
@@ -111,6 +134,7 @@ GameTest >> test005SpaceshipIsCreatedAtStartPoint [
 		         wonAfter: 1.
 
 	self assert: (aGame positionOf: aSpaceship) equals: 1
+
 ]
 
 { #category : #tests }
@@ -171,9 +195,11 @@ GameTest >> test009SpaceshipDoesNotWinUntilItLandsOnTheLastSquare [
 { #category : #tests }
 GameTest >> test011ASpaceshipMovesFiveSquaresWhenLoadedDieIsThrown [
 
-	| aSpaceship aLoadedDie aBoard aGame someDice spaceshipsData |
+	| aSpaceship aLoadedDie aBoard aGame someDice spaceshipsData anotherSpaceship |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) .
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aLoadedDie := LoadedDie of: 5.
 	someDice := OrderedCollection with: aLoadedDie.
 	aBoard := Board of: 10 wormholeBeginsAt: 2 andEndsAt: 7.
@@ -189,9 +215,11 @@ GameTest >> test011ASpaceshipMovesFiveSquaresWhenLoadedDieIsThrown [
 { #category : #tests }
 GameTest >> test012ASpaceshipMovesSevenSquaresWhenLoadedDieIsThrown [
 
-	| aSpaceship aLoadedDie aBoard aGame stack someDice spaceshipsData |
+	| aSpaceship aLoadedDie aBoard aGame stack someDice spaceshipsData anotherSpaceship |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) .
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	stack := OrderedCollection with: aSpaceship.
 	aLoadedDie := LoadedDie of: 7.
 	someDice := OrderedCollection with: aLoadedDie.
@@ -208,32 +236,48 @@ GameTest >> test012ASpaceshipMovesSevenSquaresWhenLoadedDieIsThrown [
 { #category : #tests }
 GameTest >> test016GameIndicatesTurnWithOnePlayer [
 
-	| aGame aSpaceship  spaceshipsData aBoard |
+	| aGame aSpaceship spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) .
-	aBoard := self createBoardOf: 4 distance: (ParsecDistance of: 2)  withEffects: {  }  wormholeBeginsAt: 2 andEndsAt: 3.
+	spaceshipsData := OrderedCollection with: aSpaceship.
+	aBoard := self 
+		createBoardOf: 4 
+		distance: (ParsecDistance of: 2)  
+		withEffects: { }  
+		wormholeBeginsAt: 2 
+		andEndsAt: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData 
 		         on: aBoard 
 		         throwing: nil
 		         wonAfter: 1.
+
 	self assert: aGame nextSpaceshipToPlay equals: aSpaceship
+
 ]
 
 { #category : #tests }
 GameTest >> test017GameIndicatesFirstTurnWithTwoPlayers [
 
-	| aGame aSpaceship anotherSpaceship  spaceshipsData aBoard |
+	| aGame aSpaceship anotherSpaceship spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
 	anotherSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship) .
-	aBoard := self createBoardOf: 4 distance: (ParsecDistance of: 2)  withEffects: {  }  wormholeBeginsAt: 2 andEndsAt: 3.
+	spaceshipsData := OrderedCollection with: aSpaceship with: anotherSpaceship.
+	aBoard := self 
+		createBoardOf: 4 
+		distance: (ParsecDistance of: 2)  
+		withEffects: { }  
+		wormholeBeginsAt: 2 
+		andEndsAt: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData 
 		         on: aBoard 
 		         throwing: nil
 		         wonAfter: 1.
+
 	self assert: aGame nextSpaceshipToPlay equals: aSpaceship
+
 ]
 
 { #category : #tests }
@@ -242,15 +286,23 @@ GameTest >> test018GameIndicatesSecondTurnWithTwoPlayers [
 	| aGame aSpaceship anotherSpaceship spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
 	anotherSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship) .
-	aBoard := self createBoardOf: 4 distance: (ParsecDistance of: 2)  withEffects: {  }  wormholeBeginsAt: 2 andEndsAt: 3.
+	spaceshipsData := OrderedCollection with: aSpaceship with: anotherSpaceship.
+	aBoard := self 
+		createBoardOf: 4 
+		distance: (ParsecDistance of: 2)  
+		withEffects: { }  
+		wormholeBeginsAt: 2 
+		andEndsAt: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard 
 		         throwing: nil
 		         wonAfter: 1.
+
 	aGame nextTurn.
 	self assert: aGame nextSpaceshipToPlay equals: anotherSpaceship
+
 ]
 
 { #category : #tests }
@@ -259,17 +311,26 @@ GameTest >> test019GameResetsTurnsForNextRound [
 	| aGame aSpaceship anotherSpaceship spaceshipsData aBoard |
 	aSpaceship := Spaceship launch: ''.
 	anotherSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship) .
-	aBoard := self createBoardOf: 4 distance: (ParsecDistance of: 2)  withEffects: {  }  wormholeBeginsAt: 2 andEndsAt: 3.
+	spaceshipsData := OrderedCollection with: aSpaceship with: anotherSpaceship.
+	aBoard := self 
+		createBoardOf: 4 
+		distance: (ParsecDistance of: 2)  
+		withEffects: { }  
+		wormholeBeginsAt: 2 
+		andEndsAt: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard 
 		         throwing: nil
 		         wonAfter: 1.
+
 	aGame
 		nextTurn;
 		nextTurn.
+
 	self assert: aGame nextSpaceshipToPlay equals: aSpaceship
+
 ]
 
 { #category : #tests }
@@ -299,21 +360,25 @@ GameTest >> test021WhenGameIsOverLeaderboardIsShown [
 	| aGame aSpaceship anotherSpaceship aBoard aLoadedDie someDice spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship) .
+	spaceshipsData := OrderedCollection with: aSpaceship with: anotherSpaceship.
+
 	aBoard := Board of: 6 wormholeBeginsAt: 1 andEndsAt: 2.
 	aLoadedDie := LoadedDie of: 4.
 	someDice := OrderedCollection with: aLoadedDie.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard
 		         throwing: someDice
 		         wonAfter: 1.
+
 	aGame playTurn.
 	aGame playTurn.
 
 	self
 		assert: aGame leaderBoard asOrderedCollection
 		equals: (OrderedCollection with: aSpaceship with: anotherSpaceship)
+
 ]
 
 { #category : #tests }
@@ -338,36 +403,48 @@ GameTest >> test022GameEndsAutomaticallyWhenSpaceshipPassesLastSquare [
 { #category : #tests }
 GameTest >> test023GameWithMultiplePlayersShowsLeaderBoard [
 
-	| aGame aSpaceship anotherSpaceship yetAnotherSpaceship  aBoard aLoadedDie someDice leaderboard spaceshipsData |
+	| aGame aSpaceship anotherSpaceship yetAnotherSpaceship aBoard aLoadedDie someDice leaderboard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
 	yetAnotherSpaceship := Spaceship launch: 'Three'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship) with: (SpaceshipLog randomCardsfor: yetAnotherSpaceship ).
+
+	spaceshipsData := OrderedCollection 
+		with: aSpaceship 
+		with: anotherSpaceship 
+		with: yetAnotherSpaceship.
+
 	aBoard := Board of: 10 wormholeBeginsAt: 5 andEndsAt: 6.
 	aLoadedDie := LoadedDie arrayOf:
 		              (OrderedCollection with: 3 with: 2 with: 1).
 	someDice := OrderedCollection with: aLoadedDie.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard
 		         throwing: someDice
 		         wonAfter: 1.
+
 	[ aGame isOngoing ] whileTrue: [ aGame playTurn ].
+
 	leaderboard := aGame leaderBoard.
+
 	self
 		assert: leaderboard asOrderedCollection
 		equals: (OrderedCollection
 				 with: aSpaceship
 				 with: anotherSpaceship
 				 with: yetAnotherSpaceship)
+
 ]
 
 { #category : #tests }
 GameTest >> test024GameStoresADie [
 
-	| aGame aSpaceship aBoard aLoadedDie someDice spaceshipsData |
+	| aGame aSpaceship aBoard aLoadedDie someDice spaceshipsData anotherSpaceship |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 10 wormholeBeginsAt: 1 andEndsAt: 2.
 	aLoadedDie := LoadedDie of: 6.
 	someDice := OrderedCollection with: aLoadedDie.
@@ -383,9 +460,11 @@ GameTest >> test024GameStoresADie [
 { #category : #tests }
 GameTest >> test025GameCanUseMultipleDice [
 
-	| aGame aSpaceship  aBoard aLoadedDie anotherLoadedDie someDice spaceshipsData |
+	| aGame aSpaceship  aBoard aLoadedDie anotherLoadedDie someDice spaceshipsData anotherSpaceship |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 12 wormholeBeginsAt: 1 andEndsAt: 2.
 	aLoadedDie := LoadedDie of: 6.
 	anotherLoadedDie := LoadedDie of: 4.
@@ -444,9 +523,11 @@ GameTest >> test036GameCannotShowPositionOfSpaceshipsThatArentPlaying [
 { #category : #tests }
 GameTest >> test39AfterSpaceshipPassesLastSquareForTheFirstTimeThenNumberOfLapsIsOne [
 
-	| aGame aSpaceship aBoard aDie spaceshipsData |
+	| aGame aSpaceship aBoard aDie spaceshipsData anotherSpaceship |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 5 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie of: 8.
 	aGame := Game
@@ -462,9 +543,11 @@ GameTest >> test39AfterSpaceshipPassesLastSquareForTheFirstTimeThenNumberOfLapsI
 { #category : #tests }
 GameTest >> test40AfterSpaceshipCrossesTheFinishLineTwiceThenHasTwoLaps [
 
-	| aGame aSpaceship aBoard aDie spaceshipsData |
+	| aGame aSpaceship aBoard aDie spaceshipsData anotherSpaceship|
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 5 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie of: 11.
 	aGame := Game
@@ -480,9 +563,11 @@ GameTest >> test40AfterSpaceshipCrossesTheFinishLineTwiceThenHasTwoLaps [
 { #category : #tests }
 GameTest >> test42ASpaceshipStartsWithThreeShields [
 
-	| aGame aSpaceship aDie aBoard spaceshipsData |
+	| aGame aSpaceship aDie aBoard spaceshipsData anotherSpaceship |
 	aSpaceship := Spaceship launch: ''.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie of: 3.
 	aGame := Game
@@ -499,7 +584,9 @@ GameTest >> test43AfterLosingABattleSpaceshipLosesAShield [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 1 with: 3).
 	aGame := Game
@@ -518,7 +605,9 @@ GameTest >> test44IfSpaceshipWinsBattleDoesntLoseShields [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 5 with: 3).
 	aGame := Game
@@ -537,7 +626,9 @@ GameTest >> test45SpaceshipLosesTwoBattlesAndLosesTwoShields [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 1 with: 3).
 	aGame := Game
@@ -557,7 +648,9 @@ GameTest >> test46AfterLosingBattleSpaceshipGetsSentToBeginning [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie arrayOf:
 		        (OrderedCollection with: 3 with: 3 with: 4).
@@ -578,7 +671,9 @@ GameTest >> test47WhenTwoSpaceshipsLandOnTheSameSquareTheyBattle [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 6 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie arrayOf:
 		        (OrderedCollection with: 3 with: 3 with: 2).
@@ -599,7 +694,9 @@ GameTest >> test48IfBattleEndsOnADrawThenLastSpaceshipToArriveLoses [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 6 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie of: 3.
 	aGame := Game
@@ -619,17 +716,21 @@ GameTest >> test49SpaceshipCanSkipTurn [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection with: aSpaceship with: anotherSpaceship.
+
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie of: 3.
+
 	aGame := Game
 		         playedBy: spaceshipsData
 		         on: aBoard
 		         throwing: (OrderedCollection with: aDie)
 		         wonAfter: 1.
+
 	aGame skipTurn.
 
 	self assert: aGame nextSpaceshipToPlay equals: anotherSpaceship
+
 ]
 
 { #category : #tests }
@@ -638,7 +739,9 @@ GameTest >> test50SkippingATurnRechargesShields [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 1 andEndsAt: 2.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 1 with: 2).
 	aGame := Game
@@ -658,7 +761,9 @@ GameTest >> test51FirstSquareIsASafeZone [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 2 andEndsAt: 3.
 	aDie := LoadedDie of: 4.
 	aGame := Game
@@ -677,7 +782,9 @@ GameTest >> test52IfSpaceshipLosesAllShieldsThenTheirTurnGetsSkipped [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 2 andEndsAt: 3.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 2 with: 3).
 	aGame := Game
@@ -697,7 +804,9 @@ GameTest >> test53AfterLosingAllShieldsSpaceshipCannotPlayForTwoTurns [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
 	aBoard := Board of: 4 wormholeBeginsAt: 2 andEndsAt: 3.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 2 with: 3).
 	aGame := Game
@@ -720,7 +829,10 @@ GameTest >> test54AfterLosingTwoTurnsSpaceshipCanPlayAgain [
 	| aGame aSpaceship anotherSpaceship aDie aBoard spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
+
 	aBoard := Board of: 8 wormholeBeginsAt: 6 andEndsAt: 7.
 	aDie := LoadedDie arrayOf: (OrderedCollection with: 2 with: 3).
 	aGame := Game
@@ -792,7 +904,10 @@ GameTest >> test78FirstSquareIsASafeZone [
 	| aGame aSpaceship anotherSpaceship aBoard aDie  spaceshipsData |
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship) with: (SpaceshipLog randomCardsfor: anotherSpaceship).
+	spaceshipsData := OrderedCollection 
+	with: aSpaceship 
+	with: anotherSpaceship.
+
 	aBoard := Board of: 10 wormholeBeginsAt: 1 andEndsAt: 3.
 	aDie := LoadedDie of: 3.
 

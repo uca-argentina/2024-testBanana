@@ -38,17 +38,28 @@ SpeedCardTest >> gameWithOnly: aSpaceship throwing: someDice [
 
 { #category : #tests }
 SpeedCardTest >> test169SpeedDoublesMovementRoll [
-	| game spaceship card initialPosition die |
+	| game spaceship card initialPosition die deck probabilities board |
 
 	spaceship := Spaceship launch: 'A'.
-
 	die := LoadedDie arrayOf: (OrderedCollection with: 2).
-	game := self
-		gameWithOnly: spaceship
-		throwing: (OrderedCollection with: die).
+
+	board := Board of: 100 wormholeBeginsAt: 50 andEndsAt: 80.
+
+	probabilities := OrderedCollection with: (SpeedCard -> 100).
+	deck := Deck
+		ofSize: 10
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
+
+	game := Game
+		playedBy: (OrderedCollection with: spaceship)
+		on: board
+		throwing: (OrderedCollection with: die)
+		wonAfter: 1
+		usingDeck: deck.
 
 	card := SpeedCard new.
-	(game dataFor: spaceship) addCardToHand: SpeedCard.
+	(game dataFor: spaceship) addCard: card.
 
 	initialPosition := game positionOf: spaceship.
 
@@ -58,30 +69,43 @@ SpeedCardTest >> test169SpeedDoublesMovementRoll [
 	self assert: (game positionOf: spaceship)
 		equals: initialPosition + 3.
 
+
+
 ]
 
 { #category : #tests }
 SpeedCardTest >> test170SpeedDoesNotApplyWhenTargetIsDifferent [
-	| game spaceship card die initial |
+	| game spaceship card die initial deck probabilities board |
 
 	spaceship := Spaceship launch: 'A'.
 	die := LoadedDie arrayOf: (OrderedCollection with: 2).
 
-	game := self
-		gameWithOnly: spaceship
-		throwing: (OrderedCollection with: die).
+	board := Board of: 100 wormholeBeginsAt: 50 andEndsAt: 80.
+
+	probabilities := OrderedCollection with: (SpeedCard -> 100).
+	deck := Deck
+		ofSize: 10
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
+
+	game := Game
+		playedBy: (OrderedCollection with: spaceship)
+		on: board
+		throwing: (OrderedCollection with: die)
+		wonAfter: 1
+		usingDeck: deck.
 
 	card := SpeedCard new.
-	(game dataFor: spaceship) addCardToHand: SpeedCard.
+	(game dataFor: spaceship) addCard: card.
 
 	initial := game positionOf: spaceship.
 
-	"Target distinto (nil o cualquier otro objeto)"
 	game play: card from: spaceship targeting: nil.
 	game turn.
 
 	self assert: (game positionOf: spaceship)
 		equals: initial + 2.
+
 
 
 ]

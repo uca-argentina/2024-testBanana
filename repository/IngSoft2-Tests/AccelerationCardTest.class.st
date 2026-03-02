@@ -38,17 +38,23 @@ AccelerationCardTest >> gameWithOnly: aSpaceship throwing: someDice [
 
 { #category : #tests }
 AccelerationCardTest >> test168AccelerationAddsTwoSquaresToMovement [
-	| game spaceship card initialPosition die |
+	| game spaceship card initialPosition die deck probabilities |
 
 	spaceship := Spaceship launch: 'A'.
-
 	die := LoadedDie arrayOf: (OrderedCollection with: 1).
-	game := self
-		gameWithOnly: spaceship
-		throwing: (OrderedCollection with: die).
+
+	probabilities := OrderedCollection with: (AccelerationCard -> 100).
+	deck := Deck ofSize: 10 withProbabilities: probabilities using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
+
+	game := Game
+		playedBy: (OrderedCollection with: (SpaceshipLog new initializeRandomCardsFor: spaceship))
+		on: (Board of: 100 wormholeBeginsAt: 50 andEndsAt: 80)
+		throwing: (OrderedCollection with: die)
+		wonAfter: 1
+		usingDeck: deck.
 
 	card := AccelerationCard new.
-	(game dataFor: spaceship) addCardToHand: AccelerationCard.
+	(game dataFor: spaceship) addCard: card.
 
 	initialPosition := game positionOf: spaceship.
 
@@ -61,17 +67,27 @@ AccelerationCardTest >> test168AccelerationAddsTwoSquaresToMovement [
 
 
 
+
 ]
 
 { #category : #tests }
 AccelerationCardTest >> test169AccelerationDoesNotAffectBattleRoll [
-	| game spaceship card result |
+	| game spaceship card result deck probabilities |
 
 	spaceship := Spaceship launch: 'A'.
-	game := self gameWithOnly: spaceship.
+
+	probabilities := OrderedCollection with: (AccelerationCard -> 100).
+	deck := Deck ofSize: 10 withProbabilities: probabilities using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
+
+	game := Game
+		playedBy: (OrderedCollection with: (SpaceshipLog new initializeRandomCardsFor: spaceship))
+		on: (Board of: 100 wormholeBeginsAt: 50 andEndsAt: 80)
+		throwing: OrderedCollection new
+		wonAfter: 1
+		usingDeck: deck.
 
 	card := AccelerationCard new.
-	(game dataFor: spaceship) addCardToHand: AccelerationCard.
+	(game dataFor: spaceship) addCard: card.
 
 	game play: card from: spaceship targeting: spaceship.
 
@@ -80,22 +96,29 @@ AccelerationCardTest >> test169AccelerationDoesNotAffectBattleRoll [
 	self assert: result equals: 0.
 
 
+
 ]
 
 { #category : #tests }
 AccelerationCardTest >> test171AccelerationStacksIfPlayedTwice [
-	| game spaceship die card initial |
+	| game spaceship die card initial deck probabilities |
 
 	spaceship := Spaceship launch: 'A'.
 	die := LoadedDie arrayOf: (OrderedCollection with: 1).
 
-	game := self
-		gameWithOnly: spaceship
-		throwing: (OrderedCollection with: die).
+	probabilities := OrderedCollection with: (AccelerationCard -> 100).
+	deck := Deck ofSize: 10 withProbabilities: probabilities using: (SequenceRandom withAll: #(1 2 3 4 5 6 7 8 9 10)).
+
+	game := Game
+		playedBy: (OrderedCollection with: (SpaceshipLog new initializeRandomCardsFor: spaceship))
+		on: (Board of: 100 wormholeBeginsAt: 50 andEndsAt: 80)
+		throwing: (OrderedCollection with: die)
+		wonAfter: 1
+		usingDeck: deck.
 
 	card := AccelerationCard new.
-	(game dataFor: spaceship) addCardToHand: AccelerationCard.
-	(game dataFor: spaceship) addCardToHand: AccelerationCard.
+	(game dataFor: spaceship) addCard: card.
+	(game dataFor: spaceship) addCard: card.
 
 	initial := game positionOf: spaceship.
 
@@ -105,5 +128,6 @@ AccelerationCardTest >> test171AccelerationStacksIfPlayedTwice [
 
 	self assert: (game positionOf: spaceship)
 		equals: initial + 1 + 2.
+
 
 ]

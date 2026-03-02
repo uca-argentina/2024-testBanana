@@ -25,7 +25,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'faces',
-		'myValues'
+		'myValues',
+		'currentIndex'
 	],
 	#category : #'IngSoft2-Tests'
 }
@@ -51,24 +52,32 @@ LoadedDie class >> validateNumberOf: anAmountOfFaces [
 ]
 
 { #category : #initialization }
-LoadedDie >> initializeArrayOf: values [ 
-	myValues := values .
+LoadedDie >> initializeArrayOf: values [
+	myValues := values asOrderedCollection copy.
+	currentIndex := 1.
 	faces := 0.
+	^ self
 ]
 
 { #category : #initialization }
 LoadedDie >> initializeOf: anAmountOfFaces [
-
-faces := anAmountOfFaces.
+	faces := anAmountOfFaces.
+	myValues := nil.
+	currentIndex := 1.
+	^ self
 ]
 
 { #category : #action }
 LoadedDie >> throw [
-
 	| result |
-	result := faces.
-	faces = 0 ifTrue: [
-		result := myValues removeFirst.
-		myValues addLast: result ].
+
+	myValues ifNil: [ ^ faces ].
+
+	result := myValues at: currentIndex.
+	currentIndex := currentIndex + 1.
+	currentIndex > myValues size ifTrue: [ currentIndex := 1 ].
 	^ result
+
+
+
 ]

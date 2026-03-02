@@ -39,9 +39,8 @@ Square class >> with: anEffect [
 ]
 
 { #category : #accessing }
-Square >> effect [ 
- ^effect 
-
+Square >> effect [
+	^ effect
 ]
 
 { #category : #initialization }

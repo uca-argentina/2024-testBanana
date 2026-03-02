@@ -9,16 +9,22 @@ BoardTest >> createBoardOf: length distance: aDistance withEffects: someEffects 
 
 	| squares |
 	squares := OrderedCollection new.
-	1 to: length  do: [ :i |
-	squares add: (Square with: (NullEffect isIn: i)) ].
+	1 to: length do: [:i |
+		squares add: (Square with: (NullEffect isIn: i))
+	].
 
-	someEffects do: [ :effect |
-		squares at: effect position put: (Square with: effect) ].
+	someEffects do: [:effect |
+		| index |
+		index := effect position.
+		index isInteger ifFalse: [ self error: 'Effect position must be an Integer' ].
+		squares at: index put: (Square with: effect)
+	].
+
 	^ Board
-		  with: squares
-		  length: aDistance
-		  wormholeBeginsAt: startPoint
-		  andEndsAt: endPoint
+		with: squares
+		length: aDistance
+		wormholeBeginsAt: startPoint
+		andEndsAt: endPoint
 ]
 
 { #category : #tests }

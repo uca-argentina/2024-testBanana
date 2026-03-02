@@ -27,9 +27,17 @@ Class {
 }
 
 { #category : #action }
+Turn1RechargeState >> playFor: aLog in: aGame [
+    aLog changeStateTo: Turn2RechargeState new.
+
+
+]
+
+{ #category : #action }
 Turn1RechargeState >> playIn: aGame [
 
-	|aSpaceship|
-	aSpaceship := aGame nextSpaceshipToPlay .
-	aGame changeStateOf: aSpaceship  to: (Turn2RechargeState new).
+    | aSpaceship |
+    aSpaceship := aGame nextSpaceshipToPlay.
+    aGame changeStateOf: aSpaceship to: (Turn2RechargeState new).
+
 ]

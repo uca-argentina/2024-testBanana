@@ -36,7 +36,10 @@ Class {
 		'position',
 		'state',
 		'cards',
-		'hasDoubleNextBattle'
+		'hasDoubleNextBattle',
+		'deck',
+		'name',
+		'lastMoveRoll'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -49,15 +52,7 @@ SpaceshipLog class >> for: aSpaceship withDeck: someCards [
 
 { #category : #'instance creation' }
 SpaceshipLog class >> randomCardsfor: aSpaceship [
-
-	^self new initializeRandomCardsFor: aSpaceship
-]
-
-{ #category : #comparing }
-SpaceshipLog >> = anotherSpaceship [
-
-	
-	^position = anotherSpaceship position 
+	^ self new initializeRandomCardsFor: aSpaceship
 ]
 
 { #category : #comparing }
@@ -78,8 +73,7 @@ SpaceshipLog >> activateDoubleForNextBattle [
 
 { #category : #adding }
 SpaceshipLog >> addCard: aCard [
-
-cards add: aCard .
+	cards add: aCard
 ]
 
 { #category : #adding }
@@ -90,22 +84,33 @@ SpaceshipLog >> addCardToHand: aCardClass [
 
 { #category : #adding }
 SpaceshipLog >> addRandomCard [
+	| validTypes |
 
-	| cardTypes randomCard |
-	cardTypes := OrderedCollection
-		             with: AccelerationCard
-		             with: SpeedCard
-		             with: MercenaryCard
-		             with: RedoCard
-		             with: RepeatCard.
-		randomCard := cardTypes atRandom.
-		cards add: randomCard new.
+	validTypes := OrderedCollection
+		with: AccelerationCard
+		with: SpeedCard
+		with: MercenaryCard
+		with: RedoCard
+		with: RepeatCard.
+
+	cards add: (validTypes atRandom) new
+]
+
+{ #category : #converting }
+SpaceshipLog >> asSpaceship [
+	^ spaceship
+]
+
+{ #category : #converting }
+SpaceshipLog >> asSpaceshipLogWithDeck: aDeck [
+	deck := aDeck.
+	^ self
 ]
 
 { #category : #initialization }
 SpaceshipLog >> beginIn: aBoard [
+    position := PositionTracker beginIn: aBoard.
 
-	position := PositionTracker beginIn: aBoard.
 ]
 
 { #category : #accessing }
@@ -120,9 +125,9 @@ position := newPosition .
 ]
 
 { #category : #accessing }
-SpaceshipLog >> changeStateTo: aState [ 
+SpaceshipLog >> changeStateTo: aState [
+    state := aState.
 
-state := aState 
 ]
 
 { #category : #'as yet unclassified' }
@@ -133,16 +138,57 @@ SpaceshipLog >> consumeDoubleIfPresent [
 	^ wasActive
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> dealInitialCardsFromOwnDeck [
+	2 timesRepeat: [
+		cards add: self drawCardFromOwnDeck
+	].
+]
+
 { #category : #adding }
 SpaceshipLog >> decreaseShieldsByOne [ 
 	shields := shields -1 max: 0.
 	shields = 0 ifTrue: [ state := Turn1RechargeState new  ].
 ]
 
-{ #category : #comparing }
-SpaceshipLog >> hash [ 
+{ #category : #adding }
+SpaceshipLog >> drawCardFromDeck [
+	^ deck removeFirst
+]
 
-^shields hash + position hash + spaceship hash 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> drawCardFromOwnDeck [
+	| cardClass |
+
+	deck ifNil: [ Error signal: 'Deck is missing' ].
+	deck isEmpty ifTrue: [ Error signal: 'Deck is missing' ].
+
+	cardClass := deck removeFirst.
+	deck addLast: cardClass.
+
+	^ cardClass new
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> drawFromOwnDeck [
+	| card |
+	(deck respondsTo: #draw) ifTrue: [ ^ deck draw ].
+
+	card := deck removeFirst.
+	deck addLast: card.
+	^ card
+]
+
+{ #category : #adding }
+SpaceshipLog >> drawOneCardAfterPlaying [
+	deck ifNil: [ ^ self ].
+	deck isEmpty ifTrue: [ ^ self ].
+	cards add: self drawCardFromOwnDeck.
+]
+
+{ #category : #comparing }
+SpaceshipLog >> equals: anotherObject [
+	^ self = anotherObject
 ]
 
 { #category : #'as yet unclassified' }
@@ -156,27 +202,60 @@ SpaceshipLog >> increaseShieldByOne [
 ]
 
 { #category : #initialization }
-SpaceshipLog >> initializeFor: aSpaceship withDeck: someCards [
+SpaceshipLog >> initializeFor: aSpaceship withDeck: aDeck [
 
-	spaceship := aSpaceship .
-	state := NoPenaltyState new.
+	spaceship := aSpaceship.
+	deck := aDeck.
+	cards := OrderedCollection new.
+
 	maxShields := 3.
 	shields := maxShields.
-	cards:= OrderedCollection withAll:  someCards.
+
+	state := NoPenaltyState new.
 	hasDoubleNextBattle := false.
+	lastMoveRoll := 0.
+
+	self dealInitialCardsFromOwnDeck.
+
+	^ self
+
+
 
 ]
 
 { #category : #initialization }
 SpaceshipLog >> initializeRandomCardsFor: aSpaceship [
+	| validTypes |
 
-	spaceship := aSpaceship .
+	spaceship := aSpaceship.
 	state := NoPenaltyState new.
+
 	maxShields := 3.
 	shields := maxShields.
-	cards:= OrderedCollection new.
+
+	cards := OrderedCollection new.
 	hasDoubleNextBattle := false.
-	2 timesRepeat: [ self addRandomCard].
+	lastMoveRoll := 0.
+
+	validTypes := OrderedCollection
+		with: AccelerationCard
+		with: SpeedCard
+		with: MercenaryCard
+		with: RedoCard
+		with: RepeatCard.
+
+	2 timesRepeat: [
+		cards add: (validTypes atRandom) new
+	].
+
+	^ self
+
+]
+
+{ #category : #testing }
+SpaceshipLog >> isInNoPenaltyState [
+	^ state isKindOf: NoPenaltyState
+
 ]
 
 { #category : #accessing }
@@ -185,9 +264,24 @@ SpaceshipLog >> laps [
 ]
 
 { #category : #accessing }
-SpaceshipLog >> move: someSquares [
+SpaceshipLog >> lastMoveRoll [
+	^ lastMoveRoll ifNil: [ 0 ].
+]
 
-position move: someSquares 
+{ #category : #accessing }
+SpaceshipLog >> move: someSquares [
+	position move: someSquares.
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> moveBy: movement in: aGame [
+
+	| newPosition |
+	newPosition := position + movement.
+	position := aGame board normalize: newPosition for: self.
+	aGame checkBattleAt: position triggeredBy: spaceship.
+	aGame checkForWinner.
+
 ]
 
 { #category : #accessing }
@@ -198,8 +292,8 @@ SpaceshipLog >> moveTo: aPosition [
 
 { #category : #action }
 SpaceshipLog >> playIn: aGame [
+    state playFor: self in: aGame.
 
-	state playIn: aGame 
 ]
 
 { #category : #accessing }
@@ -213,10 +307,30 @@ SpaceshipLog >> rechargeShields [
 	shields := maxShields.
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> recordLastMoveRoll: aNumber [
+	lastMoveRoll := aNumber.
+]
+
 { #category : #removing }
 SpaceshipLog >> removeCardFromHand: aCard [
+	| wantedClass cardToRemove |
 
- cards remove: (aCard class)
+	wantedClass := aCard class.
+
+	cardToRemove := cards
+		detect: [:each | each class = wantedClass]
+		ifNone: [
+			Error signal: 'A Spaceship cannot play a card that is not in its hand'
+		].
+
+	cards remove: cardToRemove.
+]
+
+{ #category : #initialization }
+SpaceshipLog >> resetPosition [
+	position reset.
+
 ]
 
 { #category : #accessing }
@@ -236,8 +350,11 @@ SpaceshipLog >> state [
 
 { #category : #validation }
 SpaceshipLog >> validateThatSpaceshipHasCard: aCard [
-	
-	(cards includes: aCard class) ifFalse: [
-		Error signal:
-			'A Spaceship cannot play a card that is not in its hand' ]
+	| wantedClass |
+	wantedClass := aCard class.
+
+	(cards anySatisfy: [:each | each class = wantedClass])
+		ifFalse: [
+			Error signal: 'A Spaceship cannot play a card that is not in its hand'
+		].
 ]
