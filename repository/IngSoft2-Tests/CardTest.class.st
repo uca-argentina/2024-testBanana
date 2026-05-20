@@ -224,6 +224,15 @@ CardTest >> test088IfSpaceshipAndOneMercenaryLoseTheBattleBothLoseShields [
 		targeting: yetAnotherSpaceship.
 	aGame playTurn.
 	aGame playTurn.
+	
+	Transcript show: '--- test088 ---'; cr.
+Transcript show: 'pos One=' , (aGame positionOf: aSpaceship) printString; cr.
+Transcript show: 'pos Two=' , (aGame positionOf: anotherSpaceship) printString; cr.
+Transcript show: 'pos Three=' , (aGame positionOf: yetAnotherSpaceship) printString; cr.
+Transcript show: 'sh One=' , (aGame shieldsOf: aSpaceship) printString; cr.
+Transcript show: 'sh Two=' , (aGame shieldsOf: anotherSpaceship) printString; cr.
+Transcript show: 'sh Three=' , (aGame shieldsOf: yetAnotherSpaceship) printString; cr.
+	
 	self assert: ((aGame shieldsOf: aSpaceship) = 2 and:
 			 (aGame shieldsOf: yetAnotherSpaceship) = 2)
 ]
@@ -309,6 +318,16 @@ CardTest >> test090IfSpaceshipAndMultipleMercenariesLoseTheBattleTheyAllLoseShie
 		targeting: fourthSpaceship.
 	aGame playTurn.
 	aGame playTurn.
+	
+	Transcript show: '--- test090 ---'; cr.
+Transcript show: 'pos One=' , (aGame positionOf: aSpaceship) printString; cr.
+Transcript show: 'pos Two=' , (aGame positionOf: anotherSpaceship) printString; cr.
+Transcript show: 'pos Three=' , (aGame positionOf: yetAnotherSpaceship) printString; cr.
+Transcript show: 'pos Four=' , (aGame positionOf: fourthSpaceship) printString; cr.
+Transcript show: 'sh One=' , (aGame shieldsOf: aSpaceship) printString; cr.
+Transcript show: 'sh Two=' , (aGame shieldsOf: anotherSpaceship) printString; cr.
+Transcript show: 'sh Three=' , (aGame shieldsOf: yetAnotherSpaceship) printString; cr.
+Transcript show: 'sh Four=' , (aGame shieldsOf: fourthSpaceship) printString; cr.
 
 	self assert: ((aGame shieldsOf: aSpaceship) = 2 and:
 			 ((aGame shieldsOf: yetAnotherSpaceship) = 2 and:

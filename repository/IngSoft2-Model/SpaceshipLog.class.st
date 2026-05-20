@@ -44,6 +44,11 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog class >> for: aSpaceship drawingFrom: aDeck [
+	^ self new initializeFor: aSpaceship drawingFrom: aDeck
+]
+
 { #category : #'instance creation' }
 SpaceshipLog class >> for: aSpaceship withDeck: someCards [
 
@@ -68,6 +73,11 @@ SpaceshipLog >> >= anotherSpaceship [
 
 { #category : #'as yet unclassified' }
 SpaceshipLog >> activateDoubleForNextBattle [
+	hasDoubleNextBattle := true.
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> activateDoubleNextBattle [
 	hasDoubleNextBattle := true.
 ]
 
@@ -96,7 +106,7 @@ SpaceshipLog >> addRandomCard [
 	cards add: (validTypes atRandom) new
 ]
 
-{ #category : #converting }
+{ #category : #accessing }
 SpaceshipLog >> asSpaceship [
 	^ spaceship
 ]
@@ -110,6 +120,16 @@ SpaceshipLog >> asSpaceshipLogWithDeck: aDeck [
 { #category : #initialization }
 SpaceshipLog >> beginIn: aBoard [
     position := PositionTracker beginIn: aBoard.
+
+]
+
+{ #category : #initialization }
+SpaceshipLog >> cardInstanceFrom: aCardOrCardClass [
+
+	(aCardOrCardClass isBehavior)
+		ifTrue: [ ^ aCardOrCardClass new ].
+
+	^ aCardOrCardClass
 
 ]
 
@@ -139,6 +159,22 @@ SpaceshipLog >> consumeDoubleIfPresent [
 ]
 
 { #category : #'as yet unclassified' }
+SpaceshipLog >> consumeDoubleNextBattleIfActive [
+
+	| wasActive |
+
+	wasActive := hasDoubleNextBattle = true.
+	hasDoubleNextBattle := false.
+
+	^ wasActive
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> consumeDoubleNextIfActive [
+	^ self consumeDoubleNextBattleIfActive
+]
+
+{ #category : #'as yet unclassified' }
 SpaceshipLog >> dealInitialCardsFromOwnDeck [
 	2 timesRepeat: [
 		cards add: self drawCardFromOwnDeck
@@ -158,15 +194,8 @@ SpaceshipLog >> drawCardFromDeck [
 
 { #category : #'as yet unclassified' }
 SpaceshipLog >> drawCardFromOwnDeck [
-	| cardClass |
-
 	deck ifNil: [ Error signal: 'Deck is missing' ].
-	deck isEmpty ifTrue: [ Error signal: 'Deck is missing' ].
-
-	cardClass := deck removeFirst.
-	deck addLast: cardClass.
-
-	^ cardClass new
+	^ deck draw
 ]
 
 { #category : #'as yet unclassified' }
@@ -181,14 +210,20 @@ SpaceshipLog >> drawFromOwnDeck [
 
 { #category : #adding }
 SpaceshipLog >> drawOneCardAfterPlaying [
+
 	deck ifNil: [ ^ self ].
-	deck isEmpty ifTrue: [ ^ self ].
+
 	cards add: self drawCardFromOwnDeck.
 ]
 
 { #category : #comparing }
 SpaceshipLog >> equals: anotherObject [
 	^ self = anotherObject
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> hasDoubleNextBattle [
+	^ hasDoubleNextBattle = true
 ]
 
 { #category : #'as yet unclassified' }
@@ -202,7 +237,7 @@ SpaceshipLog >> increaseShieldByOne [
 ]
 
 { #category : #initialization }
-SpaceshipLog >> initializeFor: aSpaceship withDeck: aDeck [
+SpaceshipLog >> initializeFor: aSpaceship drawingFrom: aDeck [
 
 	spaceship := aSpaceship.
 	deck := aDeck.
@@ -218,7 +253,27 @@ SpaceshipLog >> initializeFor: aSpaceship withDeck: aDeck [
 	self dealInitialCardsFromOwnDeck.
 
 	^ self
+]
 
+{ #category : #initialization }
+SpaceshipLog >> initializeFor: aSpaceship withDeck: someCards [
+
+	spaceship := aSpaceship.
+	deck := nil.
+	cards := OrderedCollection new.
+
+	someCards do: [ :eachCard |
+		cards add: (self cardInstanceFrom: eachCard)
+	].
+
+	maxShields := 3.
+	shields := maxShields.
+
+	state := NoPenaltyState new.
+	hasDoubleNextBattle := false.
+	lastMoveRoll := 0.
+
+	^ self
 
 
 ]
@@ -314,12 +369,15 @@ SpaceshipLog >> recordLastMoveRoll: aNumber [
 
 { #category : #removing }
 SpaceshipLog >> removeCardFromHand: aCard [
+
 	| wantedClass cardToRemove |
 
 	wantedClass := aCard class.
 
 	cardToRemove := cards
-		detect: [:each | each class = wantedClass]
+		detect: [ :each |
+			(each class = wantedClass) or: [ each = wantedClass ]
+		]
 		ifNone: [
 			Error signal: 'A Spaceship cannot play a card that is not in its hand'
 		].
@@ -350,11 +408,14 @@ SpaceshipLog >> state [
 
 { #category : #validation }
 SpaceshipLog >> validateThatSpaceshipHasCard: aCard [
+
 	| wantedClass |
+
 	wantedClass := aCard class.
 
-	(cards anySatisfy: [:each | each class = wantedClass])
-		ifFalse: [
-			Error signal: 'A Spaceship cannot play a card that is not in its hand'
-		].
+	(cards anySatisfy: [ :each |
+		(each class = wantedClass) or: [ each = wantedClass ]
+	]) ifFalse: [
+		Error signal: 'A Spaceship cannot play a card that is not in its hand'
+	]
 ]

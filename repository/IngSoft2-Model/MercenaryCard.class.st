@@ -15,31 +15,37 @@ MercenaryCard >> ally [
 
 { #category : #action }
 MercenaryCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
+
 	self validateIfCardCanBePlayedBy: aSpaceship in: aGame.
 	self validateAllianceBetween: aSpaceship and: anotherSpaceship.
 
-	aGame validateMercenaryAvailability: anotherSpaceship.
+	aGame validateMercenaryAvailability: anotherSpaceship asSpaceship.
 
-	mercenary := anotherSpaceship.
-	ally := aSpaceship.
+	ally := aSpaceship asSpaceship.
+	mercenary := anotherSpaceship asSpaceship.
 
 	aGame addActiveCard: self.
 ]
 
 { #category : #testing }
 MercenaryCard >> is: aSpaceship anAllyOf: anotherSpaceship [
-	^ ((aSpaceship == ally) and: [ anotherSpaceship == mercenary ])
-		or: [ (aSpaceship == mercenary) and: [ anotherSpaceship == ally ] ]
+
+	^ ((ally == aSpaceship asSpaceship)
+		and: [ mercenary == anotherSpaceship asSpaceship ])
+		or: [
+			(ally == anotherSpaceship asSpaceship)
+				and: [ mercenary == aSpaceship asSpaceship ]
+		]
 ]
 
 { #category : #validation }
 MercenaryCard >> isAlly: aSpaceship [
-	^ ally == aSpaceship
+	^ ally == aSpaceship asSpaceship
 ]
 
 { #category : #validation }
 MercenaryCard >> isMercenary: aSpaceship [
-	^ mercenary == aSpaceship
+	^ mercenary == aSpaceship asSpaceship
 ]
 
 { #category : #accessing }

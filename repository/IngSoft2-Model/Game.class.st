@@ -36,8 +36,11 @@ Game class >> playedBy: somePlayers
 	usingDeck: aDeck [
 
 	| logs |
+
 	logs := somePlayers collect: [ :each |
-		each asSpaceshipLogWithDeck: aDeck
+		SpaceshipLog
+			for: each asSpaceship
+			drawingFrom: aDeck
 	].
 
 	^ self new
@@ -80,26 +83,40 @@ Game >> addRandomCardFor: aSpaceship [
 { #category : #'as yet unclassified' }
 Game >> applyBattlePenaltyTo: aLoserLog [
 
-	| loserShip alliedShips uniqueShips |
+	| loserShip affectedShips uniqueShips alreadyAdded |
 
 	loserShip := aLoserLog spaceship.
 
-	alliedShips := OrderedCollection with: loserShip.
+	affectedShips := OrderedCollection new.
+	affectedShips add: loserShip.
 
-	activeCards do: [:c |
-		(c class = MercenaryCard) ifTrue: [
-			(c ally = loserShip) ifTrue: [ alliedShips add: c mercenary ].
-			(c mercenary = loserShip) ifTrue: [ alliedShips add: c ally ].
-		].
+	activeCards do: [ :card |
+		(card class = MercenaryCard) ifTrue: [
+
+			(card isAlly: loserShip) ifTrue: [
+				affectedShips add: card mercenary
+			].
+
+			(card isMercenary: loserShip) ifTrue: [
+				affectedShips add: card ally
+			].
+		]
 	].
 
 	uniqueShips := OrderedCollection new.
-	alliedShips do: [:ship |
-		(uniqueShips includes: ship) ifFalse: [ uniqueShips add: ship ].
+
+	affectedShips do: [ :ship |
+		alreadyAdded := uniqueShips anySatisfy: [ :addedShip |
+			addedShip == ship
+		].
+
+		alreadyAdded ifFalse: [
+			uniqueShips add: ship
+		]
 	].
 
-	uniqueShips do: [:ship |
-		(self dataFor: ship) decreaseShieldsByOne.
+	uniqueShips do: [ :ship |
+		(self dataFor: ship) decreaseShieldsByOne
 	].
 
 	aLoserLog resetPosition.
@@ -222,21 +239,23 @@ Game >> areAllied: aSpaceship and: anotherSpaceship [
 { #category : #action }
 Game >> battleBetween: aSpaceship and: anotherSpaceship [
 
-	| result1 result2 loser |
-	Transcript show: 'BATTLE'; cr.
+	| logA logB battleA battleB loserLog |
 
-	result1 := self throwDice.
-	result2 := self throwDice.
+	(self areAllied: aSpaceship and: anotherSpaceship)
+		ifTrue: [ ^ self ].
 
-	loser :=
-		(result1 > result2)
-			ifTrue: [ anotherSpaceship ]
-			ifFalse: [
-				(result1 < result2)
-					ifTrue: [ aSpaceship ]
-					ifFalse: [ anotherSpaceship ] ].
+	logA := self dataFor: aSpaceship.
+	logB := self dataFor: anotherSpaceship.
 
-	self reducePartyShieldsByOneOf: loser.
+	battleA := self battleRollFor: logA.
+	battleB := self battleRollFor: logB.
+
+	"En battleBetween:, si empatan pierde el primero."
+	loserLog := (battleA <= battleB)
+		ifTrue: [ logA ]
+		ifFalse: [ logB ].
+
+	self applyBattlePenaltyTo: loserLog.
 
 
 ]
@@ -275,29 +294,34 @@ Game >> battleIn: position triggeredBy: movingSpaceship [
 
 { #category : #action }
 Game >> battleRollFor: aSpaceshipLog [
-	| allyShip mercenaries maxRoll |
+
+	| allyShip mercenaries totalRoll |
 
 	allyShip := aSpaceshipLog spaceship.
 
 	mercenaries := OrderedCollection new.
-	activeCards do: [:c |
-		(c class = MercenaryCard) ifTrue: [
-			(c ally asSpaceship == allyShip) ifTrue: [
-				mercenaries add: c mercenary asSpaceship
-			].
-		].
+
+	activeCards do: [ :card |
+		(card class = MercenaryCard) ifTrue: [
+			(card ally == allyShip) ifTrue: [
+				mercenaries add: card mercenary
+			]
+		]
 	].
 
-	maxRoll := aSpaceshipLog lastMoveRoll.
+	"El ally tira para batalla."
+	totalRoll := self throwDiceFor: allyShip.
 
-	mercenaries do: [:mercShip |
-		| roll |
-		roll := (self dataFor: mercShip) lastMoveRoll.
-		(roll > maxRoll) ifTrue: [ maxRoll := roll ].
+	"Cada mercenario suma su tirada al resultado del ally."
+	mercenaries do: [ :mercenaryShip |
+		totalRoll := totalRoll + (self throwDiceFor: mercenaryShip)
 	].
 
-	^ maxRoll
+	"Double se consume en la primera batalla donde participa ese log."
+	(aSpaceshipLog consumeDoubleNextBattleIfActive)
+		ifTrue: [ totalRoll := totalRoll * 2 ].
 
+	^ totalRoll
 ]
 
 { #category : #action }
@@ -528,9 +552,16 @@ Game >> isOngoing [
 
 { #category : #testing }
 Game >> isPermanentCard: aCard [
-	^ (aCard class = SpeedCard)
-		or: [ aCard class = AccelerationCard
-		or: [ aCard class = MercenaryCard ] ]
+
+	| cls |
+
+	cls := aCard class.
+
+	(cls = RedoCard) ifTrue: [ ^ false ].
+	(cls = CancellationCard) ifTrue: [ ^ false ].
+	(cls = RepeatCard) ifTrue: [ ^ false ].
+
+	^ true
 ]
 
 { #category : #accessing }
@@ -603,12 +634,20 @@ Game >> play: aCard from: aSpaceship targeting: anotherTarget [
 
 	| spaceshipData |
 
+	(aCard class = CancellationCard) ifTrue: [
+		(activeCards includes: anotherTarget)
+			ifFalse: [ Error signal: 'Selected card is not active' ]
+	].
+
 	self validateIf: aCard canBePlayedBy: aSpaceship.
 
 	spaceshipData := self dataFor: aSpaceship.
 	spaceshipData removeCardFromHand: aCard.
 
 	aCard from: aSpaceship withTarget: anotherTarget useIn: self.
+
+	(aCard class = RedoCard)
+		ifFalse: [ lastTypeOfCardPlayed := aCard class ].
 
 	spaceshipData drawOneCardAfterPlaying.
 ]
@@ -691,29 +730,27 @@ Game >> repeatLastEffectFor: aSpaceship [
 
 { #category : #action }
 Game >> resolveBattleIfNeededFor: aSpaceship arrivingWith: arrivingRoll [
-	| square opponentLog currentLog currentRoll opponentRoll loserLog |
+
+	| square opponentLog currentLog currentBattleRoll opponentBattleRoll loserLog |
 
 	square := self positionOf: aSpaceship.
 	square = 1 ifTrue: [ ^ self ].
 
 	opponentLog := spaceshipsData
-		detect: [:log |
+		detect: [ :log |
 			(log spaceship ~~ aSpaceship)
 				and: [ (self positionOf: log spaceship) = square ] ]
 		ifNone: [ ^ self ].
 
-	(self areAllied: aSpaceship and: opponentLog spaceship) ifTrue: [ ^ self ].
+	(self areAllied: aSpaceship and: opponentLog spaceship)
+		ifTrue: [ ^ self ].
 
 	currentLog := self dataFor: aSpaceship.
 
-	"Costo mercenario: si alguno es ALLY de mercenarios, ese grupo pierde 1 shield al ocurrir batalla"
-	self applyMercenaryBattleCostIfAnyForAlly: currentLog spaceship.
-	self applyMercenaryBattleCostIfAnyForAlly: opponentLog spaceship.
+	currentBattleRoll := self battleRollFor: currentLog.
+	opponentBattleRoll := self battleRollFor: opponentLog.
 
-	currentRoll := self battleRollFor: currentLog.
-	opponentRoll := self battleRollFor: opponentLog.
-
-	loserLog := (currentRoll <= opponentRoll)
+	loserLog := (currentBattleRoll <= opponentBattleRoll)
 		ifTrue: [ currentLog ]
 		ifFalse: [ opponentLog ].
 
@@ -769,16 +806,7 @@ Game >> throwDiceFor: aSpaceship [
 
 { #category : #action }
 Game >> turn [
-
-	| aSpaceship position |
-	aSpaceship := self nextSpaceshipToPlay.
-
-	self calculateFinalPositionFor: aSpaceship.
-	position := self positionOf: aSpaceship.
-
-	self battleIn: position triggeredBy: aSpaceship.
-
-	self checkForWinnerFor: aSpaceship.
+	^ self playTurn
 
 
 
