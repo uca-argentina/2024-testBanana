@@ -10,7 +10,7 @@ Class {
 	#classInstVars : [
 		'cards'
 	],
-	#category : #'IngSoft2-Tests'
+	#category : #'IngSoft2-Model'
 }
 
 { #category : #requirements }
@@ -29,13 +29,16 @@ Deck class >> normalizedProbabilitiesFrom: someProbabilities [
 
 { #category : #'as yet unclassified' }
 Deck class >> ofSize: aSize withProbabilities: someProbabilities using: aRandom [
-    | cardClasses |
-    cardClasses := OrderedCollection new.
-    1 to: aSize do: [:i |
-        cardClasses add: (self pickCardClassFrom: someProbabilities using: aRandom)
-    ].
-    ^ self new initializeWithCardClasses: cardClasses using: aRandom
 
+	| cardClasses |
+
+	cardClasses := OrderedCollection new.
+
+	1 to: aSize do: [ :index |
+		cardClasses add: (self pickCardClassFrom: someProbabilities using: aRandom)
+	].
+
+	^ self new initializeWithCardClasses: cardClasses using: aRandom
 
 
 ]
@@ -69,20 +72,23 @@ Deck >> discardSize [
 
 { #category : #drawing }
 Deck >> draw [
-    | next |
 
-    (cards isEmpty and: [ discard isEmpty ]) ifTrue: [
-        Error signal: 'Deck has no cards available'
-    ].
+	| cardClass |
 
-    cards isEmpty ifTrue: [ self shuffleDiscardIntoDrawPile ].
+	(cards isEmpty and: [ discard isEmpty ])
+		ifTrue: [ Error signal: 'Deck has no cards available' ].
 
-    next := cards removeFirst.
-    discard addLast: next.
+	cards isEmpty ifTrue: [
+		self shuffleDiscardIntoDrawPile
+	].
 
-    "Si guardamos clases, instanciamos; si guardamos instancias, devolvemos"
-    (next isBehavior) ifTrue: [ ^ next new ].
-    ^ next
+	cardClass := cards removeFirst.
+	discard addLast: cardClass.
+
+	(cardClass isBehavior)
+		ifTrue: [ ^ cardClass new ].
+
+	^ cardClass
 
 
 
@@ -113,11 +119,12 @@ Deck >> initializeWithCardClasses: someCardClasses [
 
 { #category : #initialization }
 Deck >> initializeWithCardClasses: someCardClasses using: aRandom [
-    cards := someCardClasses asOrderedCollection.
-    discard := OrderedCollection new.
-    rng := aRandom.
 
+	cards := someCardClasses asOrderedCollection.
+	discard := OrderedCollection new.
+	random := aRandom.
 
+	^ self
 ]
 
 { #category : #initialization }
@@ -135,6 +142,45 @@ Deck >> isEmpty [
 ]
 
 { #category : #'as yet unclassified' }
+Deck >> nextIndexUpTo: aSize [
+
+	| value integerValue |
+
+	aSize = 0 ifTrue: [ Error signal: 'Deck has no cards available' ].
+
+	random ifNil: [ ^ 1 ].
+
+	value := random next.
+
+	value isInteger
+		ifTrue: [
+			^ ((value - 1) \\ aSize) + 1
+		].
+
+	integerValue := (value * aSize) floor + 1.
+
+	integerValue > aSize ifTrue: [ ^ aSize ].
+	integerValue < 1 ifTrue: [ ^ 1 ].
+
+	^ integerValue
+]
+
+{ #category : #'as yet unclassified' }
+Deck >> nextProbabilityRoll [
+
+	| value |
+
+	random ifNil: [ ^ 1 ].
+
+	value := random next.
+
+	value isInteger
+		ifTrue: [ ^ ((value - 1) \\ 100) + 1 ].
+
+	^ ((value * 100) floor) + 1
+]
+
+{ #category : #'as yet unclassified' }
 Deck >> normalizedProbabilitiesFrom: someProbabilities [
     (someProbabilities respondsTo: #associations)
         ifTrue: [ ^ someProbabilities associations asOrderedCollection ].
@@ -145,18 +191,20 @@ Deck >> normalizedProbabilitiesFrom: someProbabilities [
 
 { #category : #'as yet unclassified' }
 Deck >> pickCardType [
-    | roll acc |
-    probabilities isEmpty ifTrue: [ ^ nil ].
 
-    roll := random next.
-    roll := ((roll - 1) \\ 100) + 1.
+	| roll cumulative |
 
-    acc := 0.
-    probabilities do: [ :assoc |
-        acc := acc + assoc value.
-        roll <= acc ifTrue: [ ^ assoc key ] ].
+	probabilities isEmpty ifTrue: [ Error signal: 'Invalid probabilities' ].
 
-    ^ probabilities last key
+	roll := self nextProbabilityRoll.
+
+	cumulative := 0.
+	probabilities do: [ :association |
+		cumulative := cumulative + association value.
+		roll <= cumulative ifTrue: [ ^ association key ]
+	].
+
+	Error signal: 'Invalid probabilities'
 ]
 
 { #category : #'as yet unclassified' }
@@ -168,9 +216,9 @@ Deck >> shuffleDiscardIntoDeck [
     discard := OrderedCollection new.
 
     [ temp notEmpty ] whileTrue: [
-        roll := (rng respondsTo: #nextInt:)
-            ifTrue: [ rng nextInt: 100 ]
-            ifFalse: [ rng nextInteger: 100 ].
+        roll := (random respondsTo: #nextInt:)
+            ifTrue: [ random nextInt: 100 ]
+            ifFalse: [ random nextInteger: 100 ].
 
         index := ((roll - 1) \\ temp size) + 1.
         cards add: (temp removeAt: index).
@@ -180,26 +228,19 @@ Deck >> shuffleDiscardIntoDeck [
 
 { #category : #'as yet unclassified' }
 Deck >> shuffleDiscardIntoDrawPile [
-	| newCards size idx |
+
+	| shuffledCards index |
 
 	discard isEmpty ifTrue: [ ^ self ].
 
-	newCards := OrderedCollection new.
+	shuffledCards := OrderedCollection new.
 
 	[ discard isEmpty ] whileFalse: [
-		size := discard size.
-
-		random
-			ifNil: [ idx := 1 ]
-			ifNotNil: [
-				idx := random next.
-				idx := ((idx - 1) \\ size) + 1
-			].
-
-		newCards addLast: (discard removeAt: idx).
+		index := self nextIndexUpTo: discard size.
+		shuffledCards addLast: (discard removeAt: index)
 	].
 
-	cards := newCards
+	cards := shuffledCards.
 ]
 
 { #category : #accessing }
