@@ -30,37 +30,135 @@ Deck class >> normalizedProbabilitiesFrom: someProbabilities [
 { #category : #'as yet unclassified' }
 Deck class >> ofSize: aSize withProbabilities: someProbabilities using: aRandom [
 
-	| cardClasses |
+	| cardClasses orderedProbabilities |
+
+	orderedProbabilities := self orderedProbabilitiesFrom: someProbabilities.
+
+	aSize > 0 ifTrue: [
+		self validateProbabilities: orderedProbabilities
+	].
 
 	cardClasses := OrderedCollection new.
 
 	1 to: aSize do: [ :index |
-		cardClasses add: (self pickCardClassFrom: someProbabilities using: aRandom)
+		cardClasses add: (self pickCardClassFrom: orderedProbabilities using: aRandom)
 	].
 
 	^ self new initializeWithCardClasses: cardClasses using: aRandom
 
-
 ]
 
 { #category : #'as yet unclassified' }
-Deck class >> pickCardClassFrom: someProbabilities using: aRandom [
-    | roll cumulative ordered |
+Deck class >> orderedProbabilitiesFrom: someProbabilities [
 
-    roll := (aRandom respondsTo: #nextInt:)
-        ifTrue: [ aRandom nextInt: 100 ]
-        ifFalse: [ aRandom nextInteger: 100 ].
+	someProbabilities class = Dictionary
+		ifTrue: [ ^ self orderedProbabilitiesFromDictionary: someProbabilities ].
 
-    cumulative := 0.
-    ordered := self normalizedProbabilitiesFrom: someProbabilities.
+	^ someProbabilities asOrderedCollection
+]
 
-    ordered do: [:assoc |
-        cumulative := cumulative + assoc value.
-        (roll <= cumulative) ifTrue: [ ^ assoc key ].
-    ].
+{ #category : #'as yet unclassified' }
+Deck class >> orderedProbabilitiesFromDictionary: aDictionary [
 
-    Error signal: 'Invalid probabilities'
+	| ordered cardOrder |
 
+	ordered := OrderedCollection new.
+
+	cardOrder := OrderedCollection new.
+	cardOrder add: SpeedCard.
+	cardOrder add: AccelerationCard.
+	cardOrder add: MercenaryCard.
+	cardOrder add: RedoCard.
+	cardOrder add: RepeatCard.
+	cardOrder add: CancellationCard.
+	cardOrder add: DoubleCard.
+	cardOrder add: DefendCard.
+
+	cardOrder do: [ :cardClass |
+		(aDictionary includesKey: cardClass)
+			ifTrue: [
+				ordered add: (cardClass -> (aDictionary at: cardClass))
+			]
+	].
+
+	"Por si en algún test aparece una carta nueva que no está en cardOrder,
+	no la perdemos."
+	aDictionary associations do: [ :association |
+		(ordered anySatisfy: [ :existing | existing key = association key ])
+			ifFalse: [ ordered add: association ]
+	].
+
+	^ ordered
+]
+
+{ #category : #'as yet unclassified' }
+Deck class >> pickCardClassFrom: orderedProbabilities using: aRandom [
+
+	| roll cumulative |
+
+	orderedProbabilities isEmpty ifTrue: [
+		Error signal: 'Invalid probabilities'
+	].
+
+	roll := self probabilityRollUsing: aRandom.
+
+	cumulative := 0.
+
+	orderedProbabilities do: [ :association |
+		cumulative := cumulative + association value.
+		roll <= cumulative ifTrue: [ ^ association key ]
+	].
+
+	"Si las probabilidades fueron validadas y suman 100, este fallback
+	evita diferencias de borde entre versiones de Pharo/random."
+	^ orderedProbabilities last key
+]
+
+{ #category : #'as yet unclassified' }
+Deck class >> probabilityRollUsing: aRandom [
+
+	| value roll |
+
+	aRandom ifNil: [ ^ 1 ].
+
+	value := aRandom next.
+
+	value isInteger ifTrue: [
+		^ ((value - 1) \\ 100) + 1
+	].
+
+	roll := ((value * 100) floor) + 1.
+
+	roll < 1 ifTrue: [ ^ 1 ].
+	roll > 100 ifTrue: [ ^ 100 ].
+
+	^ roll
+]
+
+{ #category : #'as yet unclassified' }
+Deck class >> validateProbabilities: orderedProbabilities [
+
+	| total |
+
+	orderedProbabilities isEmpty ifTrue: [
+		Error signal: 'Invalid probabilities'
+	].
+
+	total := 0.
+
+	orderedProbabilities do: [ :association |
+		total := total + association value
+	].
+
+	total = 100 ifFalse: [
+		Error signal: 'Probabilities must add up to 100'
+	]
+]
+
+{ #category : #accessing }
+Deck >> discard: aCard [
+
+	discard addLast: aCard class
 
 ]
 
@@ -85,11 +183,7 @@ Deck >> draw [
 	cardClass := cards removeFirst.
 	discard addLast: cardClass.
 
-	(cardClass isBehavior)
-		ifTrue: [ ^ cardClass new ].
-
-	^ cardClass
-
+	^ cardClass new
 ]
 
 { #category : #initialization }

@@ -187,6 +187,13 @@ SpaceshipLog >> decreaseShieldsByOne [
 	shields = 0 ifTrue: [ state := Turn1RechargeState new  ].
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> discard: aCard [
+
+	| discard |
+	discard addLast: aCard class
+]
+
 { #category : #adding }
 SpaceshipLog >> drawCardFromDeck [
 	^ deck removeFirst
