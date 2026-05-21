@@ -90,8 +90,6 @@ Deck >> draw [
 
 	^ cardClass
 
-
-
 ]
 
 { #category : #initialization }
@@ -229,18 +227,8 @@ Deck >> shuffleDiscardIntoDeck [
 { #category : #'as yet unclassified' }
 Deck >> shuffleDiscardIntoDrawPile [
 
-	| shuffledCards index |
-
-	discard isEmpty ifTrue: [ ^ self ].
-
-	shuffledCards := OrderedCollection new.
-
-	[ discard isEmpty ] whileFalse: [
-		index := self nextIndexUpTo: discard size.
-		shuffledCards addLast: (discard removeAt: index)
-	].
-
-	cards := shuffledCards.
+	cards := discard.
+	discard := OrderedCollection new.
 ]
 
 { #category : #accessing }
