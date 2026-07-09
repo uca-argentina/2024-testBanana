@@ -40,3 +40,21 @@ RepeatCard >> cardType [
 RepeatCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 	aGame repeatLastEffectFor: anotherSpaceship  
 ]
+
+{ #category : #validation }
+RepeatCard >> shouldBeRememberedAsLastPlayedCard [
+
+	^ true
+]
+
+{ #category : #validation }
+RepeatCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+
+	^ self
+]
+
+{ #category : #validation }
+RepeatCard >> validateTarget: aTarget in: aGame [
+
+	^ self
+]

@@ -68,6 +68,18 @@ LoadedDie >> initializeOf: anAmountOfFaces [
 ]
 
 { #category : #action }
+LoadedDie >> reinforce: aSpaceship in: aGame [
+
+	(aGame hasDoubleFor: aSpaceship)
+		ifTrue: [
+			aGame consumeDouble.
+			^ aGame throwDice
+		].
+
+	^ 0
+]
+
+{ #category : #action }
 LoadedDie >> throw [
 	| result |
 

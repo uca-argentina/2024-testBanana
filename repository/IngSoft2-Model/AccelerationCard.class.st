@@ -31,6 +31,12 @@ AccelerationCard >> mercenary [
 ^0
 ]
 
+{ #category : #'as yet unclassified' }
+AccelerationCard >> movementBonusFor: aSpaceship [
+
+	^ 1
+]
+
 { #category : #action }
 AccelerationCard >> owner [
 	^ owner
@@ -48,10 +54,10 @@ AccelerationCard >> reduceShieldsOfAllyOf: aSpaceship in: aGame [
 
 ]
 
-{ #category : #action }
+{ #category : #'as yet unclassified' }
 AccelerationCard >> reinforce: aSpaceship in: aGame [
 
-^0.
+	^ 0
 ]
 
 { #category : #validation }

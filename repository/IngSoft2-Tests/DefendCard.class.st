@@ -9,3 +9,21 @@ DefendCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
     aGame increaseShieldByOneOf: anotherSpaceship.
 
 ]
+
+{ #category : #validation }
+DefendCard >> shouldBeRememberedAsLastPlayedCard [
+
+	^ true
+]
+
+{ #category : #validation }
+DefendCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+
+	^ self
+]
+
+{ #category : #validation }
+DefendCard >> validateTarget: aTarget in: aGame [
+
+	^ self
+]

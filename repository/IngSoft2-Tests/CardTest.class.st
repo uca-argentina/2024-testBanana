@@ -232,6 +232,8 @@ Transcript show: 'pos Three=' , (aGame positionOf: yetAnotherSpaceship) printStr
 Transcript show: 'sh One=' , (aGame shieldsOf: aSpaceship) printString; cr.
 Transcript show: 'sh Two=' , (aGame shieldsOf: anotherSpaceship) printString; cr.
 Transcript show: 'sh Three=' , (aGame shieldsOf: yetAnotherSpaceship) printString; cr.
+
+
 	
 	self assert: ((aGame shieldsOf: aSpaceship) = 2 and:
 			 (aGame shieldsOf: yetAnotherSpaceship) = 2)

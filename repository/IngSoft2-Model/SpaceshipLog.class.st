@@ -117,6 +117,15 @@ SpaceshipLog >> asSpaceshipLogWithDeck: aDeck [
 	^ self
 ]
 
+{ #category : #'as yet unclassified' }
+SpaceshipLog >> battleRollFrom: aRoll [
+
+	(self consumeDoubleNextBattleIfActive)
+		ifTrue: [ ^ aRoll * 2 ].
+
+	^ aRoll
+]
+
 { #category : #initialization }
 SpaceshipLog >> beginIn: aBoard [
     position := PositionTracker beginIn: aBoard.
@@ -215,7 +224,7 @@ SpaceshipLog >> drawFromOwnDeck [
 	^ card
 ]
 
-{ #category : #adding }
+{ #category : #'as yet unclassified' }
 SpaceshipLog >> drawOneCardAfterPlaying [
 
 	deck ifNil: [ ^ self ].

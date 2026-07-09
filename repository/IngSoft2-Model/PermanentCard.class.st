@@ -26,14 +26,52 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #'as yet unclassified' }
+PermanentCard >> addMercenariesOf: aSpaceship to: aCollection [
+
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+PermanentCard >> createsAllianceBetween: aSpaceship and: anotherSpaceship [
+
+	^ false
+]
+
 { #category : #action }
 PermanentCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 	self subclassResponsibility 
 ]
 
+{ #category : #'as yet unclassified' }
+PermanentCard >> movementBonusFor: aSpaceship [
+
+	^ 0
+]
+
+{ #category : #'as yet unclassified' }
+PermanentCard >> shipsAffectedByLossOf: aSpaceship addTo: aCollection [
+
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+PermanentCard >> shouldBeRememberedAsLastPlayedCard [
+
+	^ true
+]
+
 { #category : #validation }
 PermanentCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
 
-	aSpaceship = aGame nextSpaceshipToPlay ifFalse: [
-		Error signal: 'Card cannot be played out of turn' ]
+	aSpaceship = aGame nextSpaceshipToPlay
+		ifFalse: [
+			Error signal: 'Card cannot be played out of turn'
+		].
+]
+
+{ #category : #'as yet unclassified' }
+PermanentCard >> validateTarget: aTarget in: aGame [
+
+	^ self
 ]

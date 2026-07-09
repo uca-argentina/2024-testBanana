@@ -42,6 +42,18 @@ RedoCard >> from: aSpaceship withTarget: aTarget useIn: aGame [
 ]
 
 { #category : #validation }
+RedoCard >> shouldBeRememberedAsLastPlayedCard [
+
+	^ false
+]
+
+{ #category : #validation }
 RedoCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+	^ self
+]
+
+{ #category : #validation }
+RedoCard >> validateTarget: aTarget in: aGame [
+
 	^ self
 ]

@@ -21,3 +21,21 @@ DoubleCard >> reinforce: aSpaceship in: aGame [
 
 
 ]
+
+{ #category : #validation }
+DoubleCard >> shouldBeRememberedAsLastPlayedCard [
+
+	^ true
+]
+
+{ #category : #validation }
+DoubleCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
+
+	^ self
+]
+
+{ #category : #validation }
+DoubleCard >> validateTarget: aTarget in: aGame [
+
+	^ self
+]
