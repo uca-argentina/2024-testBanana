@@ -28,70 +28,51 @@ jobs:
         with:
           smalltalk-image: ${{ matrix.smalltalk }}
 
-      - name: Download Pharo 8 64-bit image
-        if: matrix.smalltalk == 'Pharo64-8.0'
+      - name: Download Pharo 8 image
+        if: matrix.smalltalk == 'Pharo64-8.0' || matrix.smalltalk == 'Pharo32-8.0'
         shell: bash
         run: |
           set -euo pipefail
 
           mkdir -p .ci/pharo8
 
-          IMAGE_ZIP=$(
-            curl -fsSL "https://files.pharo.org/image/80/" |
-            grep -oE 'href="[^"]*64bit[^"]*\.zip"' |
-            cut -d'"' -f2 |
-            grep -E 'Pharo8\.0' |
-            grep -vE '(alpha|beta|rc)' |
-            sort -V |
-            tail -n 1
-          )
-
-          if [[ -z "$IMAGE_ZIP" ]]; then
-            IMAGE_ZIP=$(
-              curl -fsSL "https://files.pharo.org/image/80/" |
-              grep -oE 'href="[^"]*64bit[^"]*\.zip"' |
-              cut -d'"' -f2 |
-              grep -E 'Pharo8\.0' |
-              sort -V |
-              tail -n 1
-            )
+          if [[ "${{ matrix.smalltalk }}" == "Pharo64-8.0" ]]; then
+            IMAGE_URL="https://files.pharo.org/image/80/stable-64.zip"
+          else
+            IMAGE_URL="https://files.pharo.org/image/80/stable-32.zip"
           fi
 
-          if [[ -z "$IMAGE_ZIP" ]]; then
-            echo "No se encontró una imagen Pharo 8 de 64 bits."
-            exit 1
-          fi
-
-          IMAGE_ZIP="${IMAGE_ZIP#./}"
-
-          echo "Descargando $IMAGE_ZIP"
+          echo "Downloading $IMAGE_URL"
 
           curl -fL \
-            "https://files.pharo.org/image/80/$IMAGE_ZIP" \
+            "$IMAGE_URL" \
             -o .ci/pharo8/pharo8.zip
 
-          unzip -q .ci/pharo8/pharo8.zip -d .ci/pharo8
+          unzip -q \
+            .ci/pharo8/pharo8.zip \
+            -d .ci/pharo8
 
-          IMAGE_FILE=$(find .ci/pharo8 -type f -name '*.image' | head -n 1)
+          IMAGE_FILE=$(find .ci/pharo8 -type f -name '*.image' -print -quit)
 
           if [[ -z "$IMAGE_FILE" ]]; then
-            echo "El archivo descargado no contiene una imagen de Pharo."
+            echo "The downloaded ZIP does not contain a Pharo image."
             exit 1
           fi
 
+          echo "Using image: $IMAGE_FILE"
           echo "PHARO8_IMAGE=$IMAGE_FILE" >> "$GITHUB_ENV"
 
-      - name: Run smalltalkCI on Pharo64-8.0
-        if: matrix.smalltalk == 'Pharo64-8.0'
+      - name: Run smalltalkCI on Pharo 8
+        if: matrix.smalltalk == 'Pharo64-8.0' || matrix.smalltalk == 'Pharo32-8.0'
         shell: bash
         timeout-minutes: 6
         run: |
           smalltalkci \
-            -s Pharo64-8.0 \
+            -s "${{ matrix.smalltalk }}" \
             --image "$PHARO8_IMAGE"
 
       - name: Run smalltalkCI
-        if: matrix.smalltalk != 'Pharo64-8.0'
+        if: matrix.smalltalk != 'Pharo64-8.0' && matrix.smalltalk != 'Pharo32-8.0'
         shell: bash
         timeout-minutes: 6
         run: |
