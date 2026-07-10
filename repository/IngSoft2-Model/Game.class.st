@@ -11,8 +11,6 @@ Class {
 		'activeCards',
 		'lastTypeOfCardPlayed',
 		'lastEffectTriggered',
-		'doubleTarget',
-		'lastRolls',
 		'spaceshipWithDouble',
 		'deck'
 	],
@@ -174,24 +172,6 @@ Game >> changeStateOf: aSpaceship to: aState [
 ]
 
 { #category : #'as yet unclassified' }
-Game >> checkBattleFor: aSpaceship [
-
-	| itsPosition rival |
-
-	itsPosition := self positionOf: aSpaceship.
-
-	rival := spaceshipsData
-		detect: [ :log |
-			log spaceship ~= aSpaceship
-			and: [ log position = itsPosition ] ]
-		ifNone: [ ^ self ].
-
-	self battleBetween: aSpaceship and: rival spaceship.
-
-
-]
-
-{ #category : #'as yet unclassified' }
 Game >> checkForWinnerFor: aSpaceship [
 
 	((self lapsOf: aSpaceship) >= laps)
@@ -290,11 +270,12 @@ Game >> initializePlayedBy: somePlayers
 	throwing: someDice
 	wonAfter: aNumberOfLaps [
 
-	spaceshipsData := OrderedCollection newFrom: (somePlayers collect: [:each |
-		(each isKindOf: SpaceshipLog)
-			ifTrue: [ each ]
-			ifFalse: [ SpaceshipLog randomCardsfor: each ]
-	]).
+	spaceshipsData := OrderedCollection newFrom:
+		(somePlayers collect: [ :each |
+			(each isKindOf: SpaceshipLog)
+				ifTrue: [ each ]
+				ifFalse: [ SpaceshipLog randomCardsfor: each ]
+		]).
 
 	board := aBoard.
 
@@ -649,7 +630,6 @@ Game >> turnFor: aSpaceship [
 	diceResult := self throwDiceFor: aSpaceship.
 
 	data := self dataFor: aSpaceship.
-	data recordLastMoveRoll: diceResult.
 	data move: diceResult.
 
 	board
@@ -657,7 +637,10 @@ Game >> turnFor: aSpaceship [
 		afterMovingTo: (self positionOf: aSpaceship)
 		whenPlaying: self.
 
-	self resolveBattleIfNeededFor: aSpaceship arrivingWith: diceResult.
+	self
+		resolveBattleIfNeededFor: aSpaceship
+		arrivingWith: diceResult.
+
 	self checkForWinnerFor: aSpaceship.
 ]
 

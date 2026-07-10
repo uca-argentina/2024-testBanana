@@ -37,9 +37,7 @@ Class {
 		'state',
 		'cards',
 		'hasDoubleNextBattle',
-		'deck',
-		'name',
-		'lastMoveRoll'
+		'deck'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -230,7 +228,6 @@ SpaceshipLog >> initializeFor: aSpaceship drawingFrom: aDeck [
 
 	state := NoPenaltyState new.
 	hasDoubleNextBattle := false.
-	lastMoveRoll := 0.
 
 	self dealInitialCardsFromOwnDeck.
 
@@ -253,7 +250,6 @@ SpaceshipLog >> initializeFor: aSpaceship withDeck: someCards [
 
 	state := NoPenaltyState new.
 	hasDoubleNextBattle := false.
-	lastMoveRoll := 0.
 
 	^ self
 
@@ -272,7 +268,6 @@ SpaceshipLog >> initializeRandomCardsFor: aSpaceship [
 
 	cards := OrderedCollection new.
 	hasDoubleNextBattle := false.
-	lastMoveRoll := 0.
 
 	validTypes := OrderedCollection
 		with: AccelerationCard
@@ -301,24 +296,8 @@ SpaceshipLog >> laps [
 ]
 
 { #category : #accessing }
-SpaceshipLog >> lastMoveRoll [
-	^ lastMoveRoll ifNil: [ 0 ].
-]
-
-{ #category : #accessing }
 SpaceshipLog >> move: someSquares [
 	position move: someSquares.
-]
-
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> moveBy: movement in: aGame [
-
-	| newPosition |
-	newPosition := position + movement.
-	position := aGame board normalize: newPosition for: self.
-	aGame checkBattleAt: position triggeredBy: spaceship.
-	aGame checkForWinner.
-
 ]
 
 { #category : #accessing }
@@ -342,11 +321,6 @@ SpaceshipLog >> position [
 SpaceshipLog >> rechargeShields [
 
 	shields := maxShields.
-]
-
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> recordLastMoveRoll: aNumber [
-	lastMoveRoll := aNumber.
 ]
 
 { #category : #removing }
