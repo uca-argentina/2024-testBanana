@@ -572,9 +572,16 @@ Game >> skipTurn [
 
 { #category : #action }
 Game >> speedBonusFor: aSpaceship [
-	(activeCards anySatisfy: [:c | (c class = SpeedCard) and: [ c owner == aSpaceship ] ])
-		ifTrue: [ ^ 1 ].
-	^ 0
+
+	| bonus |
+
+	bonus := 0.
+
+	activeCards do: [ :card |
+		bonus := bonus + (card speedBonusFor: aSpaceship)
+	].
+
+	^ bonus
 ]
 
 { #category : #action }

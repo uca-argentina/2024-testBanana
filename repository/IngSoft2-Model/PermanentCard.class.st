@@ -85,6 +85,12 @@ PermanentCard >> shouldBeRememberedAsLastPlayedCard [
 	^ true
 ]
 
+{ #category : #action }
+PermanentCard >> speedBonusFor: aSpaceship [
+
+	^ 0
+]
+
 { #category : #'as yet unclassified' }
 PermanentCard >> usesAsMercenary: aSpaceship [
 

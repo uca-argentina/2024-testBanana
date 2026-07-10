@@ -6,9 +6,6 @@ Class {
 		'discard',
 		'random'
 	],
-	#classInstVars : [
-		'cards'
-	],
 	#category : #'IngSoft2-Model'
 }
 

@@ -54,6 +54,12 @@ SpeedCard >> movementBonusFor: aSpaceship [
 	^ 0
 ]
 
+{ #category : #action }
+SpeedCard >> speedBonusFor: aSpaceship [
+
+	^ self movementBonusFor: aSpaceship
+]
+
 { #category : #validation }
 SpeedCard >> validateAllianceBetween: aSpaceship and: anotherSpaceship [
 ]

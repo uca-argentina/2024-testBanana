@@ -172,18 +172,12 @@ SpaceshipLog >> decreaseShieldsByOne [
 
 { #category : #'as yet unclassified' }
 SpaceshipLog >> drawCardFromOwnDeck [
-	deck ifNil: [ Error signal: 'Deck is missing' ].
+
+	deck ifNil: [
+		Error signal: 'Deck is missing'
+	].
+
 	^ deck draw
-]
-
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> drawFromOwnDeck [
-	| card |
-	(deck respondsTo: #draw) ifTrue: [ ^ deck draw ].
-
-	card := deck removeFirst.
-	deck addLast: card.
-	^ card
 ]
 
 { #category : #'as yet unclassified' }
@@ -192,7 +186,7 @@ SpaceshipLog >> drawOneCardAfterPlaying [
 	deck ifNil: [ ^ self ].
 	deck isEmpty ifTrue: [ ^ self ].
 
-	cards add: self drawFromOwnDeck.
+	cards add: self drawCardFromOwnDeck.
 ]
 
 { #category : #comparing }

@@ -1,7 +1,7 @@
 Class {
 	#name : #DefendCard,
 	#superclass : #Object,
-	#category : #'IngSoft2-Tests'
+	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
