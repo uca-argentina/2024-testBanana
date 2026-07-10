@@ -70,7 +70,7 @@ jobs:
 
           mkdir -p .ci/pharo8/vm
 
-          VM_URL="https://files.pharo.org/get-files/80/pharo-vm-Linux-x86_64-stable.zip"
+          VM_URL="https://files.pharo.org/get-files/80/pharo64-linux-headless-stable.zip"
 
           echo "Downloading Pharo 8 VM: $VM_URL"
 
