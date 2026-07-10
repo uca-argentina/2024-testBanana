@@ -4,7 +4,6 @@ Class {
 	#instVars : [
 		'cards',
 		'discard',
-		'probabilities',
 		'random'
 	],
 	#classInstVars : [
@@ -17,14 +16,6 @@ Class {
 Deck class >> empty [
     ^ self new initializeWithCardClasses: OrderedCollection new
 
-]
-
-{ #category : #'as yet unclassified' }
-Deck class >> normalizedProbabilitiesFrom: someProbabilities [
-    (someProbabilities respondsTo: #associations)
-        ifTrue: [ ^ someProbabilities associations asOrderedCollection ].
-
-    ^ someProbabilities asOrderedCollection
 ]
 
 { #category : #'as yet unclassified' }
@@ -179,21 +170,6 @@ Deck >> draw [
 ]
 
 { #category : #initialization }
-Deck >> initializeOfSize: aSize withProbabilities: someProbabilities using: aRandom [
-	random := aRandom.
-	cards := OrderedCollection new.
-	discard := OrderedCollection new.
-
-	probabilities := someProbabilities asOrderedCollection.
-
-	1 to: aSize do: [ :i |
-		cards addLast: self pickCardType
-	].
-
-	^ self
-]
-
-{ #category : #initialization }
 Deck >> initializeWithCardClasses: someCardClasses [
     cards := someCardClasses.
     discard := OrderedCollection new.
@@ -249,48 +225,6 @@ Deck >> nextIndexUpTo: aSize [
 	^ integerValue
 ]
 
-{ #category : #'as yet unclassified' }
-Deck >> nextProbabilityRoll [
-
-	| value |
-
-	random ifNil: [ ^ 1 ].
-
-	value := random next.
-
-	value isInteger
-		ifTrue: [ ^ ((value - 1) \\ 100) + 1 ].
-
-	^ ((value * 100) floor) + 1
-]
-
-{ #category : #'as yet unclassified' }
-Deck >> normalizedProbabilitiesFrom: someProbabilities [
-    (someProbabilities respondsTo: #associations)
-        ifTrue: [ ^ someProbabilities associations asOrderedCollection ].
-
-    ^ someProbabilities asOrderedCollection
-
-]
-
-{ #category : #'as yet unclassified' }
-Deck >> pickCardType [
-
-	| roll cumulative |
-
-	probabilities isEmpty ifTrue: [ Error signal: 'Invalid probabilities' ].
-
-	roll := self nextProbabilityRoll.
-
-	cumulative := 0.
-	probabilities do: [ :association |
-		cumulative := cumulative + association value.
-		roll <= cumulative ifTrue: [ ^ association key ]
-	].
-
-	Error signal: 'Invalid probabilities'
-]
-
 { #category : #drawing }
 Deck >> refillFromDiscard [
 
@@ -299,25 +233,6 @@ Deck >> refillFromDiscard [
 	].
 
 	self shuffleDiscardIntoDrawPile.
-]
-
-{ #category : #'as yet unclassified' }
-Deck >> shuffleDiscardIntoDeck [
-    | temp roll index |
-
-    temp := discard copy.
-    cards := OrderedCollection new.
-    discard := OrderedCollection new.
-
-    [ temp notEmpty ] whileTrue: [
-        roll := (random respondsTo: #nextInt:)
-            ifTrue: [ random nextInt: 100 ]
-            ifFalse: [ random nextInteger: 100 ].
-
-        index := ((roll - 1) \\ temp size) + 1.
-        cards add: (temp removeAt: index).
-    ].
-
 ]
 
 { #category : #'as yet unclassified' }
