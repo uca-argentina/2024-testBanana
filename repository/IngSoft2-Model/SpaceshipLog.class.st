@@ -104,12 +104,6 @@ SpaceshipLog >> asSpaceship [
 	^ spaceship
 ]
 
-{ #category : #converting }
-SpaceshipLog >> asSpaceshipLogWithDeck: aDeck [
-	deck := aDeck.
-	^ self
-]
-
 { #category : #'as yet unclassified' }
 SpaceshipLog >> battleRollFrom: aRoll [
 

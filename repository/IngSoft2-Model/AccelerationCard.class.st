@@ -1,22 +1,13 @@
 Class {
 	#name : #AccelerationCard,
 	#superclass : #PermanentCard,
-	#instVars : [
-		'owner',
-		'affectedSpaceship'
-	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #action }
-AccelerationCard >> affectedSpaceship [
-	^ affectedSpaceship
-]
-
-{ #category : #action }
 AccelerationCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
+
 	self validateIfCardCanBePlayedBy: aSpaceship in: aGame.
-	affectedSpaceship := anotherSpaceship.
 	aGame addActiveCard: self.
 ]
 
@@ -26,26 +17,10 @@ AccelerationCard >> is: aSpaceship anAllyOf: anotherSpaceship [
 ^false.
 ]
 
-{ #category : #accessing }
-AccelerationCard >> mercenary [
-^0
-]
-
 { #category : #'as yet unclassified' }
 AccelerationCard >> movementBonusFor: aSpaceship [
 
 	^ 1
-]
-
-{ #category : #action }
-AccelerationCard >> owner [
-	^ owner
-]
-
-{ #category : #playing }
-AccelerationCard >> playOn: aSpaceship [
-	^ 1
-
 ]
 
 { #category : #validation }

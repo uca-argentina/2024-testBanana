@@ -27,17 +27,10 @@ Class {
 	#name : #SpeedCard,
 	#superclass : #PermanentCard,
 	#instVars : [
-		'target',
-		'owner',
 		'affectedSpaceship'
 	],
 	#category : #'IngSoft2-Model'
 }
-
-{ #category : #accessing }
-SpeedCard >> affectedSpaceship [
-	^ affectedSpaceship
-]
 
 { #category : #action }
 SpeedCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
@@ -52,11 +45,6 @@ SpeedCard >> is: aSpaceship anAllyOf: anotherSpaceship [
 ^false.
 ]
 
-{ #category : #accessing }
-SpeedCard >> mercenary [
-^0
-]
-
 { #category : #validation }
 SpeedCard >> movementBonusFor: aSpaceship [
 
@@ -64,19 +52,6 @@ SpeedCard >> movementBonusFor: aSpaceship [
 		ifTrue: [ ^ 1 ].
 
 	^ 0
-]
-
-{ #category : #accessing }
-SpeedCard >> owner [
-	^ owner
-]
-
-{ #category : #playing }
-SpeedCard >> playOn: aSpaceship [
-| cardModifier |
-cardModifier:=0.
-aSpaceship = target ifTrue:[cardModifier:= 1].
-^cardModifier
 ]
 
 { #category : #validation }

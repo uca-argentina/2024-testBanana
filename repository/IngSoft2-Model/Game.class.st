@@ -57,15 +57,6 @@ Game >> addActiveCard: aCard [
 ]
 
 { #category : #adding }
-Game >> addCardFor: aSpaceship [
-
-	| log |
-	log := self dataFor: aSpaceship.
-	log addCard: deck draw.
-
-]
-
-{ #category : #adding }
 Game >> addRandomCardFor: aSpaceship [
 
 (self dataFor: aSpaceship) addRandomCard.
@@ -326,14 +317,6 @@ Game >> initializeSpaceships [
 Game >> is: spaceship in: position [
 
 	^ (self positionOf: spaceship) = position
-]
-
-{ #category : #action }
-Game >> is: aSpaceship notAnAllyOf: anotherSpaceship [
-
-	^ (self
-		areAllied: aSpaceship
-		and: anotherSpaceship) not
 ]
 
 { #category : #accessing }

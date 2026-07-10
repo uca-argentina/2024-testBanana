@@ -71,12 +71,6 @@ MercenaryCard >> mercenary [
 ]
 
 { #category : #action }
-MercenaryCard >> reduceShieldsOfAllyOf: aSpaceship in: aGame [
-
-aSpaceship =ally ifTrue: [ aGame decreaseShieldByOneOf:  mercenary. ].
-]
-
-{ #category : #action }
 MercenaryCard >> reinforce: aSpaceship in: aGame [
 
 
