@@ -70,9 +70,9 @@ jobs:
 
           mkdir -p .ci/pharo8/vm
 
-          VM_URL="https://files.pharo.org/vm/pharo-spur64/linux/stable-threaded-20201102.zip"
+          VM_URL="https://files.pharo.org/get-files/80/pharo-vm-Linux-x86_64-stable.zip"
 
-          echo "Downloading VM: $VM_URL"
+          echo "Downloading Pharo 8 VM: $VM_URL"
 
           curl -fL \
             "$VM_URL" \
@@ -82,17 +82,19 @@ jobs:
             .ci/pharo8/vm.zip \
             -d .ci/pharo8/vm
 
-          VM_FILE=$(find .ci/pharo8/vm -name 'pharo' -print -quit)
+          echo "Files contained in the VM package:"
+          find .ci/pharo8/vm -maxdepth 4 -type f
+
+          VM_FILE=$(find .ci/pharo8/vm -type f -name 'pharo' -print -quit)
 
           if [[ -z "$VM_FILE" ]]; then
             echo "The downloaded ZIP does not contain the Pharo VM executable."
-            find .ci/pharo8/vm -maxdepth 4 -type f
             exit 1
           fi
 
           chmod +x "$VM_FILE"
 
-          echo "Using VM: $VM_FILE"
+          echo "Using Pharo 8 VM: $VM_FILE"
           echo "PHARO8_VM=$VM_FILE" >> "$GITHUB_ENV"
 
       - name: Run smalltalkCI on Pharo64-8.0
