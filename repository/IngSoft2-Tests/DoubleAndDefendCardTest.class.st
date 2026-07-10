@@ -496,3 +496,57 @@ DoubleAndDefendCardTest >> test166CannotDrawWhenDeckAndDiscardAreEmpty [
 
 
 ]
+
+{ #category : #tests }
+DoubleAndDefendCardTest >> test178DoubleAppliesWhenTargetSpaceshipParticipatesAsMercenary [
+
+	| game ally mercenary opponent board die mercenaryCard doubleCard firstRoll secondRoll |
+
+	ally := Spaceship launch: 'Ally'.
+	mercenary := Spaceship launch: 'Mercenary'.
+	opponent := Spaceship launch: 'Opponent'.
+
+	board := Board
+		of: 100
+		wormholeBeginsAt: 50
+		andEndsAt: 80.
+
+	die := LoadedDie arrayOf:
+		(OrderedCollection
+			with: 2
+			with: 3
+			with: 2
+			with: 3).
+
+	game := Game
+		playedBy:
+			(OrderedCollection
+				with: ally
+				with: mercenary
+				with: opponent)
+		on: board
+		throwing: (OrderedCollection with: die)
+		wonAfter: 1.
+
+	mercenaryCard := MercenaryCard new.
+	doubleCard := DoubleCard new.
+
+	mercenaryCard
+		from: ally
+		withTarget: mercenary
+		useIn: game.
+
+	doubleCard
+		from: ally
+		withTarget: mercenary
+		useIn: game.
+
+	firstRoll := game battleRollFor: (game dataFor: ally).
+	secondRoll := game battleRollFor: (game dataFor: ally).
+
+	self assert: firstRoll equals: 8.
+	self assert: secondRoll equals: 5.
+
+
+
+]

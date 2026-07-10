@@ -1120,64 +1120,87 @@ CardTest >> test115IfASpaceshipPlaysACardItIsRemovedFromItsHand [
 { #category : #tests }
 CardTest >> test116MysteryCardEffectAddsACardToASpaceshipThatLandsInIt [
 
-	| aGame aSpaceship aBoard aDie spaceshipsData mysteryCardEffect |
+	| aGame aSpaceship aBoard aDie mysteryCardEffect
+	  probabilities deck initialCardCount |
+
 	aSpaceship := Spaceship launch: 'One'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog randomCardsfor: aSpaceship  ).
-	mysteryCardEffect := (MysteryCardEffect isIn: 4).
-	
-	
+	mysteryCardEffect := MysteryCardEffect isIn: 4.
+
 	aBoard := self
-		          createBoardOf: 16
-		          distance: (ParsecDistance of: 1)
-		          withEffects: (OrderedCollection with: mysteryCardEffect)
-		          wormholeBeginsAt: 13
-		          andEndsAt: 14.
+		createBoardOf: 16
+		distance: (ParsecDistance of: 1)
+		withEffects: (OrderedCollection with: mysteryCardEffect)
+		wormholeBeginsAt: 13
+		andEndsAt: 14.
 
 	aDie := LoadedDie of: 3.
+
+	probabilities := OrderedCollection
+		with: SpeedCard -> 100.
+
+	deck := Deck
+		ofSize: 20
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll:
+			(1 to: 20) asOrderedCollection).
+
 	aGame := Game
-		         playedBy: spaceshipsData
-		         on: aBoard
-		         throwing: (OrderedCollection with: aDie)
-		         wonAfter: 3.
-	aGame playTurn .
-	
-	self assert: (spaceshipsData first cards size) equals: 3
+		playedBy: (OrderedCollection with: aSpaceship)
+		on: aBoard
+		throwing: (OrderedCollection with: aDie)
+		wonAfter: 3
+		usingDeck: deck.
+
+	initialCardCount := (aGame dataFor: aSpaceship) cards size.
+
+	aGame playTurn.
+
+	self
+		assert: (aGame dataFor: aSpaceship) cards size
+		equals: initialCardCount + 1.
 ]
 
 { #category : #tests }
 CardTest >> test117MysteryCardEffectAddsValidCardTypesToSpaceships [
 
-	| aGame aSpaceship aBoard aDie spaceshipsData mysteryCardEffect cardTypes |
+	| aGame aSpaceship aBoard aDie mysteryCardEffect
+	  probabilities deck initialCardCount cards |
+
 	aSpaceship := Spaceship launch: 'One'.
-	spaceshipsData := OrderedCollection with:
-		                  (SpaceshipLog randomCardsfor: aSpaceship).
-	mysteryCardEffect := (MysteryCardEffect isIn: 4).
-	
+	mysteryCardEffect := MysteryCardEffect isIn: 4.
+
 	aBoard := self
-		          createBoardOf: 20
-		          distance: (ParsecDistance of: 1)
-		          withEffects: (OrderedCollection with: mysteryCardEffect)
-		          wormholeBeginsAt: 13
-		          andEndsAt: 14.
+		createBoardOf: 20
+		distance: (ParsecDistance of: 1)
+		withEffects: (OrderedCollection with: mysteryCardEffect)
+		wormholeBeginsAt: 13
+		andEndsAt: 14.
 
 	aDie := LoadedDie of: 3.
-	
+
+	probabilities := OrderedCollection
+		with: DefendCard -> 100.
+
+	deck := Deck
+		ofSize: 20
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll:
+			(1 to: 20) asOrderedCollection).
+
 	aGame := Game
-		         playedBy: spaceshipsData
-		         on: aBoard
-		         throwing: (OrderedCollection with: aDie)
-		         wonAfter: 3.
-	cardTypes := OrderedCollection
-		             with: AccelerationCard
-		             with: SpeedCard
-		             with: MercenaryCard
-		             with: RedoCard
-		             with: RepeatCard.
+		playedBy: (OrderedCollection with: aSpaceship)
+		on: aBoard
+		throwing: (OrderedCollection with: aDie)
+		wonAfter: 3
+		usingDeck: deck.
+
+	cards := (aGame dataFor: aSpaceship) cards.
+	initialCardCount := cards size.
+
 	aGame playTurn.
 
-
-	self assert: (spaceshipsData first cards allSatisfy: [ :card |
-			 cardTypes includes: card class ])
+	self assert: cards size equals: initialCardCount + 1.
+	self assert: cards last class equals: DefendCard.
 ]
 
 { #category : #tests }
@@ -1215,31 +1238,53 @@ CardTest >> test118MercenarySpaceshipDoesNotRecieveHelpFromItsAlly [
 { #category : #tests }
 CardTest >> test119WhenRepeatCardIsPlayedAfterMysteryCardEffectThenTargetSpaceshipGainsACard [
 
-	| aGame aSpaceship aBoard aDie anotherSpaceship aCard mysteryCardEffect spaceshipsData |
+	| aGame aSpaceship anotherSpaceship aBoard aCard
+	  mysteryCardEffect probabilities deck initialCardCount |
+
 	aSpaceship := Spaceship launch: 'One'.
 	anotherSpaceship := Spaceship launch: 'Two'.
-	spaceshipsData:= OrderedCollection with: (SpaceshipLog for: aSpaceship  withDeck: (OrderedCollection with: MercenaryCard  with: AccelerationCard )  ) with: (SpaceshipLog for: anotherSpaceship withDeck: (OrderedCollection with: RepeatCard  with: AccelerationCard ) ).
-	mysteryCardEffect := ( MysteryCardEffect isIn: 4).
-	
-	aBoard := self
-		          createBoardOf: 10
-		          distance: (ParsecDistance of: 1)
-		          withEffects: (OrderedCollection with: mysteryCardEffect)
-		          wormholeBeginsAt: 8
-		          andEndsAt: 9.
 
-	aDie := LoadedDie arrayOf: (OrderedCollection with: 4 with: 3).
+	mysteryCardEffect := MysteryCardEffect isIn: 4.
+
+	aBoard := self
+		createBoardOf: 10
+		distance: (ParsecDistance of: 1)
+		withEffects: OrderedCollection new
+		wormholeBeginsAt: 8
+		andEndsAt: 9.
+
+	probabilities := OrderedCollection
+		with: RepeatCard -> 100.
+
+	deck := Deck
+		ofSize: 30
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll:
+			(1 to: 30) asOrderedCollection).
+
 	aGame := Game
-		         playedBy: spaceshipsData
-		         on: aBoard
-		         throwing: (OrderedCollection with: aDie)
-		         wonAfter: 3.
+		playedBy:
+			(OrderedCollection
+				with: aSpaceship
+				with: anotherSpaceship)
+		on: aBoard
+		throwing: OrderedCollection new
+		wonAfter: 3
+		usingDeck: deck.
+
+	aGame saveLastEffectTriggeredTo: mysteryCardEffect.
+
+	initialCardCount := (aGame dataFor: aSpaceship) cards size.
 	aCard := RepeatCard new.
-	aGame playTurn.
-	aGame playTurn.
-	aGame play: aCard from: anotherSpaceship targeting: aSpaceship .
-	
-	self assert: (spaceshipsData first cards size) equals: 3.
+
+	aGame
+		play: aCard
+		from: anotherSpaceship
+		targeting: aSpaceship.
+
+	self
+		assert: (aGame dataFor: aSpaceship) cards size
+		equals: initialCardCount + 1.
 ]
 
 { #category : #tests }

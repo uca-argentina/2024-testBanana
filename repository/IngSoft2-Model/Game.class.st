@@ -57,9 +57,12 @@ Game >> addActiveCard: aCard [
 ]
 
 { #category : #adding }
-Game >> addRandomCardFor: aSpaceship [
+Game >> addCardFromDeckFor: aSpaceship [
 
-(self dataFor: aSpaceship) addRandomCard.
+	deck ifNil: [ ^ self ].
+	deck isEmpty ifTrue: [ ^ self ].
+
+	(self dataFor: aSpaceship) addCard: deck draw.
 ]
 
 { #category : #'as yet unclassified' }
@@ -131,15 +134,18 @@ Game >> battleRollFor: aSpaceshipLog [
 
 	| totalRoll |
 
-	totalRoll := self throwDiceFor: aSpaceshipLog spaceship.
+	totalRoll := aSpaceshipLog battleRollFrom:
+		(self throwDiceFor: aSpaceshipLog spaceship).
 
 	(self mercenariesOf: aSpaceshipLog spaceship)
 		do: [ :mercenary |
 			totalRoll := totalRoll
-				+ (self throwDiceFor: mercenary)
+				+ ((self dataFor: mercenary)
+					battleRollFrom:
+						(self throwDiceFor: mercenary))
 		].
 
-	^ aSpaceshipLog battleRollFrom: totalRoll
+	^ totalRoll
 ]
 
 { #category : #action }

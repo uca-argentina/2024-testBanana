@@ -43,6 +43,26 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+SpaceshipLog class >> defaultInitialCardProbabilities [
+
+	^ OrderedCollection
+		with: AccelerationCard -> 20
+		with: SpeedCard -> 20
+		with: MercenaryCard -> 20
+		with: RedoCard -> 20
+		with: RepeatCard -> 20
+]
+
+{ #category : #'as yet unclassified' }
+SpaceshipLog class >> defaultInitialDeck [
+
+	^ Deck
+		ofSize: 2
+		withProbabilities: self defaultInitialCardProbabilities
+		using: Random new
+]
+
+{ #category : #'as yet unclassified' }
 SpaceshipLog class >> for: aSpaceship drawingFrom: aDeck [
 	^ self new initializeFor: aSpaceship drawingFrom: aDeck
 ]
@@ -83,20 +103,6 @@ SpaceshipLog >> addCard: aCard [
 SpaceshipLog >> addCardToHand: aCardClass [
 	cards add: aCardClass
 
-]
-
-{ #category : #adding }
-SpaceshipLog >> addRandomCard [
-	| validTypes |
-
-	validTypes := OrderedCollection
-		with: AccelerationCard
-		with: SpeedCard
-		with: MercenaryCard
-		with: RedoCard
-		with: RepeatCard.
-
-	cards add: (validTypes atRandom) new
 ]
 
 { #category : #accessing }
@@ -246,30 +252,10 @@ SpaceshipLog >> initializeFor: aSpaceship withDeck: someCards [
 
 { #category : #initialization }
 SpaceshipLog >> initializeRandomCardsFor: aSpaceship [
-	| validTypes |
-
-	spaceship := aSpaceship.
-	state := NoPenaltyState new.
-
-	maxShields := 3.
-	shields := maxShields.
-
-	cards := OrderedCollection new.
-	hasDoubleNextBattle := false.
-
-	validTypes := OrderedCollection
-		with: AccelerationCard
-		with: SpeedCard
-		with: MercenaryCard
-		with: RedoCard
-		with: RepeatCard.
-
-	2 timesRepeat: [
-		cards add: (validTypes atRandom) new
-	].
 
 	^ self
-
+		initializeFor: aSpaceship
+		drawingFrom: self class defaultInitialDeck
 ]
 
 { #category : #testing }

@@ -38,7 +38,7 @@ MysteryCardEffect class >> isIn: aPosition [
 { #category : #action }
 MysteryCardEffect >> applyIn: aGame for: aSpaceship [
 
-aGame addRandomCardFor: aSpaceship .
+	aGame addCardFromDeckFor: aSpaceship.
 
 ]
 
