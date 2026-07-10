@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          mkdir -p .ci/pharo8
+          mkdir -p .ci/pharo8/image
 
           if [[ "${{ matrix.smalltalk }}" == "Pharo64-8.0" ]]; then
             IMAGE_URL="https://files.pharo.org/image/80/stable-64.zip"
@@ -42,17 +42,17 @@ jobs:
             IMAGE_URL="https://files.pharo.org/image/80/stable-32.zip"
           fi
 
-          echo "Downloading $IMAGE_URL"
+          echo "Downloading image: $IMAGE_URL"
 
           curl -fL \
             "$IMAGE_URL" \
-            -o .ci/pharo8/pharo8.zip
+            -o .ci/pharo8/image.zip
 
           unzip -q \
-            .ci/pharo8/pharo8.zip \
-            -d .ci/pharo8
+            .ci/pharo8/image.zip \
+            -d .ci/pharo8/image
 
-          IMAGE_FILE=$(find .ci/pharo8 -type f -name '*.image' -print -quit)
+          IMAGE_FILE=$(find .ci/pharo8/image -type f -name '*.image' -print -quit)
 
           if [[ -z "$IMAGE_FILE" ]]; then
             echo "The downloaded ZIP does not contain a Pharo image."
@@ -62,19 +62,62 @@ jobs:
           echo "Using image: $IMAGE_FILE"
           echo "PHARO8_IMAGE=$IMAGE_FILE" >> "$GITHUB_ENV"
 
-      - name: Run smalltalkCI on Pharo 8
-        if: matrix.smalltalk == 'Pharo64-8.0' || matrix.smalltalk == 'Pharo32-8.0'
+      - name: Download Pharo 8 64-bit VM
+        if: matrix.smalltalk == 'Pharo64-8.0'
         shell: bash
-        timeout-minutes: 6
+        run: |
+          set -euo pipefail
+
+          mkdir -p .ci/pharo8/vm
+
+          VM_URL="https://files.pharo.org/vm/pharo-spur64/linux/stable-threaded-20201102.zip"
+
+          echo "Downloading VM: $VM_URL"
+
+          curl -fL \
+            "$VM_URL" \
+            -o .ci/pharo8/vm.zip
+
+          unzip -q \
+            .ci/pharo8/vm.zip \
+            -d .ci/pharo8/vm
+
+          VM_FILE=$(find .ci/pharo8/vm -name 'pharo' -print -quit)
+
+          if [[ -z "$VM_FILE" ]]; then
+            echo "The downloaded ZIP does not contain the Pharo VM executable."
+            find .ci/pharo8/vm -maxdepth 4 -type f
+            exit 1
+          fi
+
+          chmod +x "$VM_FILE"
+
+          echo "Using VM: $VM_FILE"
+          echo "PHARO8_VM=$VM_FILE" >> "$GITHUB_ENV"
+
+      - name: Run smalltalkCI on Pharo64-8.0
+        if: matrix.smalltalk == 'Pharo64-8.0'
+        shell: bash
+        timeout-minutes: 10
         run: |
           smalltalkci \
-            -s "${{ matrix.smalltalk }}" \
+            -s Pharo64-8.0 \
+            --image "$PHARO8_IMAGE" \
+            --vm "$PHARO8_VM"
+
+      - name: Run smalltalkCI on Pharo32-8.0
+        if: matrix.smalltalk == 'Pharo32-8.0'
+        shell: bash
+        timeout-minutes: 10
+        run: |
+          smalltalkci \
+            -s Pharo32-8.0 \
             --image "$PHARO8_IMAGE"
 
       - name: Run smalltalkCI
         if: matrix.smalltalk != 'Pharo64-8.0' && matrix.smalltalk != 'Pharo32-8.0'
         shell: bash
-        timeout-minutes: 6
+        timeout-minutes: 10
         run: |
           smalltalkci -s "${{ matrix.smalltalk }}"
 
