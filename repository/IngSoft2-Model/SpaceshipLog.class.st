@@ -76,11 +76,6 @@ SpaceshipLog >> activateDoubleForNextBattle [
 	hasDoubleNextBattle := true.
 ]
 
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> activateDoubleNextBattle [
-	hasDoubleNextBattle := true.
-]
-
 { #category : #adding }
 SpaceshipLog >> addCard: aCard [
 	cards add: aCard
@@ -160,14 +155,6 @@ SpaceshipLog >> changeStateTo: aState [
 ]
 
 { #category : #'as yet unclassified' }
-SpaceshipLog >> consumeDoubleIfPresent [
-	| wasActive |
-	wasActive := hasDoubleNextBattle.
-	hasDoubleNextBattle := false.
-	^ wasActive
-]
-
-{ #category : #'as yet unclassified' }
 SpaceshipLog >> consumeDoubleNextBattleIfActive [
 
 	| wasActive |
@@ -176,11 +163,6 @@ SpaceshipLog >> consumeDoubleNextBattleIfActive [
 	hasDoubleNextBattle := false.
 
 	^ wasActive
-]
-
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> consumeDoubleNextIfActive [
-	^ self consumeDoubleNextBattleIfActive
 ]
 
 { #category : #'as yet unclassified' }
@@ -194,18 +176,6 @@ SpaceshipLog >> dealInitialCardsFromOwnDeck [
 SpaceshipLog >> decreaseShieldsByOne [ 
 	shields := shields -1 max: 0.
 	shields = 0 ifTrue: [ state := Turn1RechargeState new  ].
-]
-
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> discard: aCard [
-
-	| discard |
-	discard addLast: aCard class
-]
-
-{ #category : #adding }
-SpaceshipLog >> drawCardFromDeck [
-	^ deck removeFirst
 ]
 
 { #category : #'as yet unclassified' }
@@ -228,18 +198,14 @@ SpaceshipLog >> drawFromOwnDeck [
 SpaceshipLog >> drawOneCardAfterPlaying [
 
 	deck ifNil: [ ^ self ].
+	deck isEmpty ifTrue: [ ^ self ].
 
-	cards add: self drawCardFromOwnDeck.
+	cards add: self drawFromOwnDeck.
 ]
 
 { #category : #comparing }
 SpaceshipLog >> equals: anotherObject [
 	^ self = anotherObject
-]
-
-{ #category : #'as yet unclassified' }
-SpaceshipLog >> hasDoubleNextBattle [
-	^ hasDoubleNextBattle = true
 ]
 
 { #category : #'as yet unclassified' }

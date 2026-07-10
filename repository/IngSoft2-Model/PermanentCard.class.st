@@ -49,10 +49,34 @@ PermanentCard >> movementBonusFor: aSpaceship [
 	^ 0
 ]
 
+{ #category : #action }
+PermanentCard >> playOn: aSpaceship [
+
+	^ 0
+]
+
+{ #category : #action }
+PermanentCard >> reduceShieldsOfAllyOf: aSpaceship in: aGame [
+
+	^ self
+]
+
+{ #category : #action }
+PermanentCard >> reinforce: aSpaceship in: aGame [
+
+	^ 0
+]
+
 { #category : #'as yet unclassified' }
 PermanentCard >> shipsAffectedByLossOf: aSpaceship addTo: aCollection [
 
 	^ self
+]
+
+{ #category : #asserting }
+PermanentCard >> shouldBeDiscardedAfterPlaying [
+
+	^ false
 ]
 
 { #category : #'as yet unclassified' }
@@ -61,10 +85,16 @@ PermanentCard >> shouldBeRememberedAsLastPlayedCard [
 	^ true
 ]
 
+{ #category : #'as yet unclassified' }
+PermanentCard >> usesAsMercenary: aSpaceship [
+
+	^ false
+]
+
 { #category : #validation }
 PermanentCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
 
-	aSpaceship = aGame nextSpaceshipToPlay
+	(aGame nextSpaceshipToPlay == aSpaceship)
 		ifFalse: [
 			Error signal: 'Card cannot be played out of turn'
 		].

@@ -41,6 +41,12 @@ RedoCard >> from: aSpaceship withTarget: aTarget useIn: aGame [
 	aGame redoLastCardPlayedFor: aSpaceship withTarget: aTarget
 ]
 
+{ #category : #asserting }
+RedoCard >> shouldBeDiscardedAfterPlaying [
+
+	^ true
+]
+
 { #category : #validation }
 RedoCard >> shouldBeRememberedAsLastPlayedCard [
 

@@ -48,24 +48,6 @@ AccelerationCard >> playOn: aSpaceship [
 
 ]
 
-{ #category : #action }
-AccelerationCard >> reduceShieldsOfAllyOf: aSpaceship in: aGame [
-
-
-]
-
-{ #category : #'as yet unclassified' }
-AccelerationCard >> reinforce: aSpaceship in: aGame [
-
-	^ 0
-]
-
 { #category : #validation }
 AccelerationCard >> validateAllianceBetween: aSpaceship and: anotherSpaceship [
-]
-
-{ #category : #validation }
-AccelerationCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
-	(aGame nextSpaceshipToPlay == aSpaceship)
-		ifFalse: [ Error signal: 'Card cannot be played out of turn' ].
 ]

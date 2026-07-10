@@ -22,6 +22,12 @@ DoubleCard >> reinforce: aSpaceship in: aGame [
 
 ]
 
+{ #category : #asserting }
+DoubleCard >> shouldBeDiscardedAfterPlaying [
+
+	^ true
+]
+
 { #category : #validation }
 DoubleCard >> shouldBeRememberedAsLastPlayedCard [
 

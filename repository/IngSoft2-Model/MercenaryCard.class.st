@@ -70,18 +70,6 @@ MercenaryCard >> mercenary [
 	^ mercenary
 ]
 
-{ #category : #'as yet unclassified' }
-MercenaryCard >> movementBonusFor: aSpaceship [
-
-	^ 0
-]
-
-{ #category : #playing }
-MercenaryCard >> playOn: aSpaceship [
-
-^0.
-]
-
 { #category : #action }
 MercenaryCard >> reduceShieldsOfAllyOf: aSpaceship in: aGame [
 
@@ -110,14 +98,14 @@ MercenaryCard >> shipsAffectedByLossOf: aSpaceship addTo: aCollection [
 		].
 ]
 
+{ #category : #'as yet unclassified' }
+MercenaryCard >> usesAsMercenary: aSpaceship [
+
+	^ mercenary == aSpaceship asSpaceship
+]
+
 { #category : #validation }
 MercenaryCard >> validateAllianceBetween: aSpaceship and: anotherSpaceship [
 	(aSpaceship == anotherSpaceship)
 		ifTrue: [ Error signal: 'A spaceship cannot be its own mercenary' ].
-]
-
-{ #category : #validation }
-MercenaryCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
-	(aGame nextSpaceshipToPlay == aSpaceship)
-		ifFalse: [ Error signal: 'Card cannot be played out of turn' ].
 ]

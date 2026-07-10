@@ -158,7 +158,7 @@ Deck class >> validateProbabilities: orderedProbabilities [
 { #category : #accessing }
 Deck >> discard: aCard [
 
-	discard addLast: aCard class
+	discard addLast: aCard class.
 
 ]
 
@@ -171,19 +171,11 @@ Deck >> discardSize [
 { #category : #drawing }
 Deck >> draw [
 
-	| cardClass |
-
-	(cards isEmpty and: [ discard isEmpty ])
-		ifTrue: [ Error signal: 'Deck has no cards available' ].
-
 	cards isEmpty ifTrue: [
-		self shuffleDiscardIntoDrawPile
+		self refillFromDiscard
 	].
 
-	cardClass := cards removeFirst.
-	discard addLast: cardClass.
-
-	^ cardClass new
+	^ cards removeFirst new
 ]
 
 { #category : #initialization }
@@ -299,6 +291,16 @@ Deck >> pickCardType [
 	Error signal: 'Invalid probabilities'
 ]
 
+{ #category : #drawing }
+Deck >> refillFromDiscard [
+
+	discard isEmpty ifTrue: [
+		Error signal: 'Deck has no cards available'
+	].
+
+	self shuffleDiscardIntoDrawPile.
+]
+
 { #category : #'as yet unclassified' }
 Deck >> shuffleDiscardIntoDeck [
     | temp roll index |
@@ -321,8 +323,18 @@ Deck >> shuffleDiscardIntoDeck [
 { #category : #'as yet unclassified' }
 Deck >> shuffleDiscardIntoDrawPile [
 
-	cards := discard.
+	| cardsToShuffle |
+
+	cardsToShuffle := discard copy.
+	cards := OrderedCollection new.
 	discard := OrderedCollection new.
+
+	[ cardsToShuffle notEmpty ] whileTrue: [
+		cards addLast: (
+			cardsToShuffle removeAt:
+				(self nextIndexUpTo: cardsToShuffle size)
+		)
+	].
 ]
 
 { #category : #accessing }

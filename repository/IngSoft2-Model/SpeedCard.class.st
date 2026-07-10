@@ -79,25 +79,6 @@ aSpaceship = target ifTrue:[cardModifier:= 1].
 ^cardModifier
 ]
 
-{ #category : #action }
-SpeedCard >> reduceShieldsOfAllyOf: aSpaceship in: aGame [
-]
-
-{ #category : #validation }
-SpeedCard >> reinforce: aSpaceship in: aGame [
-
-	^ 0
-]
-
 { #category : #validation }
 SpeedCard >> validateAllianceBetween: aSpaceship and: anotherSpaceship [
-]
-
-{ #category : #validation }
-SpeedCard >> validateIfCardCanBePlayedBy: aSpaceship in: aGame [
-
-	(aGame nextSpaceshipToPlay == aSpaceship)
-		ifFalse: [
-			Error signal: 'Card cannot be played out of turn'
-		].
 ]

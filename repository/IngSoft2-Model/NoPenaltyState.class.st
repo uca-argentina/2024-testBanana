@@ -42,12 +42,3 @@ NoPenaltyState >> playIn: aGame [
 	aGame turnFor: spaceship
 
 ]
-
-{ #category : #action }
-NoPenaltyState >> playTurnFor: aLog in: aGame [
-
-	| movement |
-	movement := aGame throwDice.
-	aLog moveBy: movement in: aGame.
-
-]

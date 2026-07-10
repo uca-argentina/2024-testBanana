@@ -31,6 +31,12 @@ CancellationCard >> from: aSpaceship withTarget: aCard useIn: aGame [
 	aGame removeActiveCard: aCard.
 ]
 
+{ #category : #asserting }
+CancellationCard >> shouldBeDiscardedAfterPlaying [
+
+	^ true
+]
+
 { #category : #validation }
 CancellationCard >> shouldBeRememberedAsLastPlayedCard [
 

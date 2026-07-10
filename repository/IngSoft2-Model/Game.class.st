@@ -54,8 +54,7 @@ Game class >> playedBy: somePlayers
 { #category : #adding }
 Game >> addActiveCard: aCard [
 
-lastTypeOfCardPlayed := aCard class.
-activeCards add: aCard.
+	activeCards add: aCard.
 
 ]
 
@@ -258,6 +257,14 @@ Game >> dice [
 ^ dice.
 ]
 
+{ #category : #action }
+Game >> discardCard: aCard [
+
+	deck ifNil: [ ^ self ].
+
+	deck discard: aCard.
+]
+
 { #category : #adding }
 Game >> end [
 	state := GameFinishedState new.
@@ -341,30 +348,17 @@ Game >> is: spaceship in: position [
 ]
 
 { #category : #action }
-Game >> is: spaceship notAnAllyOf: aSpaceship [
+Game >> is: aSpaceship notAnAllyOf: anotherSpaceship [
 
-	^ activeCards allSatisfy: [ :card |
-		  (card is: aSpaceship anAllyOf: spaceship) not ]
+	^ (self
+		areAllied: aSpaceship
+		and: anotherSpaceship) not
 ]
 
 { #category : #accessing }
 Game >> isOngoing [
 
 ^ state isOngoing.
-]
-
-{ #category : #testing }
-Game >> isPermanentCard: aCard [
-
-	| cls |
-
-	cls := aCard class.
-
-	(cls = RedoCard) ifTrue: [ ^ false ].
-	(cls = CancellationCard) ifTrue: [ ^ false ].
-	(cls = RepeatCard) ifTrue: [ ^ false ].
-
-	^ true
 ]
 
 { #category : #accessing }
@@ -467,6 +461,11 @@ Game >> play: aCard from: aSpaceship targeting: anotherTarget [
 			lastTypeOfCardPlayed := aCard class
 		].
 
+	aCard shouldBeDiscardedAfterPlaying
+		ifTrue: [
+			self discardCard: aCard
+		].
+
 	spaceshipData drawOneCardAfterPlaying.
 ]
 
@@ -515,14 +514,15 @@ Game >> redoLastCardPlayedFor: aSpaceship withTarget: aTarget [
 Game >> removeActiveCard: aCard [
 
 	self validateActiveCardSelected: aCard.
+
 	activeCards remove: aCard.
+	self discardCard: aCard.
 ]
 
 { #category : #action }
-Game >> repeatLastEffectFor: aSpaceship [ 
+Game >> repeatLastEffectFor: aSpaceship [
 
-	lastEffectTriggered applyIn: self for: aSpaceship.	
-	lastTypeOfCardPlayed := RepeatCard .
+	lastEffectTriggered applyIn: self for: aSpaceship.
 	
 	
 
@@ -692,16 +692,22 @@ Game >> validateLastCardPlayed [
 
 { #category : #validation }
 Game >> validateMercenaryAvailability: aSpaceship [
+
 	| ship |
 
 	ship := aSpaceship asSpaceship.
 
 	(spaceships includes: ship)
-		ifFalse: [ Error signal: 'That spaceship is not a player in this game' ].
+		ifFalse: [
+			Error signal: 'That spaceship is not a player in this game'
+		].
 
-	(activeCards anySatisfy: [:c |
-		(c class = MercenaryCard) and: [ c mercenary asSpaceship == ship ]
-	]) ifTrue: [ Error signal: 'Selected spaceship is already a mercenary' ].
+	(activeCards anySatisfy: [ :card |
+		card usesAsMercenary: ship
+	])
+		ifTrue: [
+			Error signal: 'Selected spaceship is already a mercenary'
+		].
 ]
 
 { #category : #accessing }

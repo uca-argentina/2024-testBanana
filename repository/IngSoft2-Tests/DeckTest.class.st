@@ -55,33 +55,53 @@ self assert: second class equals: AccelerationCard.
 ]
 
 { #category : #tests }
-DeckTest >> test147DrawingACardReducesDeckAndAddsToDiscard [
-    | deck probabilities rng card |
-    probabilities := Dictionary new
-        at: SpeedCard put: 100;
-        yourself.
-    rng := SequenceRandom withAll: (OrderedCollection with: 1).
-    deck := Deck ofSize: 3 withProbabilities: probabilities using: rng.
-    card := deck draw.
-    self assert: deck size equals: 2.
-    self assert: deck discardSize equals: 1.
+DeckTest >> test147DrawingACardReducesDeckWithoutDiscardingIt [
+
+	| deck probabilities |
+
+	probabilities := OrderedCollection
+		with: SpeedCard -> 100.
+
+	deck := Deck
+		ofSize: 3
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3)).
+
+	deck draw.
+
+	self assert: deck size equals: 2.
+	self assert: deck discardSize equals: 0.
 
 ]
 
 { #category : #tests }
 DeckTest >> test148WhenDeckIsEmptyItShufflesDiscardAndContinuesDrawing [
-    | deck probabilities rng first second |
-    probabilities := Dictionary new
-        at: SpeedCard put: 100;
-        yourself.
-    rng := SequenceRandom withAll: (OrderedCollection with: 1).
-    deck := Deck ofSize: 1 withProbabilities: probabilities using: rng.
-    first := deck draw.
-    second := deck draw.
-    self assert: first class equals: SpeedCard.
-    self assert: second class equals: SpeedCard.
-    self assert: deck discardSize equals: 1.
 
+	| deck probabilities rng first second |
+
+	probabilities := Dictionary new
+		at: SpeedCard put: 100;
+		yourself.
+
+	rng := SequenceRandom withAll:
+		(OrderedCollection
+			with: 1
+			with: 1).
+
+	deck := Deck
+		ofSize: 1
+		withProbabilities: probabilities
+		using: rng.
+
+	first := deck draw.
+	deck discard: first.
+
+	second := deck draw.
+
+	self assert: first class equals: SpeedCard.
+	self assert: second class equals: SpeedCard.
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 0.
 ]
 
 { #category : #tests }
@@ -99,80 +119,122 @@ DeckTest >> test149DrawingFromCompletelyEmptyDeckRaisesError [
 
 { #category : #tests }
 DeckTest >> test150DeckKeepsTotalCardsBetweenDeckAndDiscard [
-    | deck probabilities rng |
 
-    probabilities := Dictionary new
-        at: SpeedCard put: 100;
-        yourself.
+	| deck probabilities rng first second |
 
-    rng := SequenceRandom withAll: (OrderedCollection with: 1 with: 1 with: 1).
+	probabilities := Dictionary new
+		at: SpeedCard put: 100;
+		yourself.
 
-    deck := Deck ofSize: 3 withProbabilities: probabilities using: rng.
+	rng := SequenceRandom withAll:
+		(OrderedCollection
+			with: 1
+			with: 1
+			with: 1).
 
-    deck draw.
-    self assert: deck size equals: 2.
-    self assert: deck discardSize equals: 1.
+	deck := Deck
+		ofSize: 3
+		withProbabilities: probabilities
+		using: rng.
 
-    deck draw.
-    self assert: deck size equals: 1.
-    self assert: deck discardSize equals: 2.
+	first := deck draw.
 
+	self assert: deck size equals: 2.
+	self assert: deck discardSize equals: 0.
+
+	deck discard: first.
+
+	self assert: deck size equals: 2.
+	self assert: deck discardSize equals: 1.
+
+	second := deck draw.
+
+	self assert: deck size equals: 1.
+	self assert: deck discardSize equals: 1.
+
+	deck discard: second.
+
+	self assert: deck size equals: 1.
+	self assert: deck discardSize equals: 2.
 ]
 
 { #category : #tests }
 DeckTest >> test151WhenDeckIsEmptyItRefillsFromDiscard [
-    | deck probabilities rng |
 
-    probabilities := Dictionary new
-        at: SpeedCard put: 100;
-        yourself.
+	| deck probabilities rng first second |
 
-    rng := SequenceRandom withAll: (OrderedCollection with: 1 with: 1).
+	probabilities := Dictionary new
+		at: SpeedCard put: 100;
+		yourself.
 
-    deck := Deck ofSize: 1 withProbabilities: probabilities using: rng.
+	rng := SequenceRandom withAll:
+		(OrderedCollection
+			with: 1
+			with: 1).
 
-    deck draw. "deck vacío, discard tiene 1"
+	deck := Deck
+		ofSize: 1
+		withProbabilities: probabilities
+		using: rng.
 
-    self assert: deck size equals: 0.
-    self assert: deck discardSize equals: 1.
+	first := deck draw.
 
-    deck draw. "debería refill desde discard"
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 0.
 
-    self assert: deck size equals: 0.
-    self assert: deck discardSize equals: 1.
+	deck discard: first.
 
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 1.
 
+	second := deck draw.
+
+	self assert: second class equals: SpeedCard.
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 0.
 ]
 
 { #category : #tests }
 DeckTest >> test152RefillRespectsInjectedRandomOrder [
-    | deck probabilities rng first second third |
 
-    probabilities := Dictionary new
-        at: SpeedCard put: 50;
-        at: AccelerationCard put: 50;
-        yourself.
+	| deck probabilities rng first second third |
 
-    "Construcción: Speed luego Acceleration"
-    rng := SequenceRandom withAll: (OrderedCollection with: 1 with: 100).
+	probabilities := Dictionary new
+		at: SpeedCard put: 50;
+		at: AccelerationCard put: 50;
+		yourself.
 
-    deck := Deck ofSize: 2 withProbabilities: probabilities using: rng.
+	"Los dos primeros valores construyen el mazo.
+	Los dos últimos controlan el orden del refill."
+	rng := SequenceRandom withAll:
+		(OrderedCollection
+			with: 1
+			with: 100
+			with: 1
+			with: 1).
 
-    first := deck draw.
-    second := deck draw.
+	deck := Deck
+		ofSize: 2
+		withProbabilities: probabilities
+		using: rng.
 
-    self assert: first class equals: SpeedCard.
-    self assert: second class equals: AccelerationCard.
+	first := deck draw.
+	second := deck draw.
 
-    "Deck vacío, discard tiene [Speed, Acceleration]"
+	self assert: first class equals: SpeedCard.
+	self assert: second class equals: AccelerationCard.
 
-    "Ahora refill: si shuffle usa RNG, el orden debería ser controlable"
-    third := deck draw.
+	deck discard: first.
+	deck discard: second.
 
-    "Queremos que vuelva a salir Speed primero"
-    self assert: third class equals: SpeedCard.
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 2.
 
+	third := deck draw.
 
+	self assert: third class equals: SpeedCard.
+	self assert: deck size equals: 1.
+	self assert: deck discardSize equals: 0.
 ]
 
 { #category : #tests }
@@ -191,27 +253,62 @@ DeckTest >> test161DrawFailsWhenDeckAndDiscardAreEmpty [
 
 { #category : #tests }
 DeckTest >> test162DrawRefillsDeckFromDiscard [
-    | deck probabilities rng first second third |
 
-    probabilities := Dictionary new
-        at: SpeedCard put: 100;
-        yourself.
+	| deck probabilities rng first second third |
 
-    rng := SequenceRandom withAll: (OrderedCollection with: 1).
+	probabilities := Dictionary new
+		at: SpeedCard put: 100;
+		yourself.
 
-    deck := Deck ofSize: 2 withProbabilities: probabilities using: rng.
+	rng := SequenceRandom withAll:
+		(OrderedCollection
+			with: 1
+			with: 1
+			with: 1
+			with: 1).
 
-    first := deck draw.
-    second := deck draw.
+	deck := Deck
+		ofSize: 2
+		withProbabilities: probabilities
+		using: rng.
 
-    "Deck vacío, discard tiene 2 cartas"
-    self assert: deck size equals: 0.
-    self assert: deck discardSize equals: 2.
+	first := deck draw.
+	second := deck draw.
 
-    third := deck draw.
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 0.
 
-    self assert: third class equals: SpeedCard.
-    self assert: deck discardSize equals: 1.
+	deck discard: first.
+	deck discard: second.
+
+	self assert: deck size equals: 0.
+	self assert: deck discardSize equals: 2.
+
+	third := deck draw.
+
+	self assert: third class equals: SpeedCard.
+	self assert: deck size equals: 1.
+	self assert: deck discardSize equals: 0.
+]
+
+{ #category : #tests }
+DeckTest >> test177UsedCardIsAddedToDiscard [
+
+	| deck probabilities card |
+
+	probabilities := OrderedCollection
+		with: SpeedCard -> 100.
+
+	deck := Deck
+		ofSize: 3
+		withProbabilities: probabilities
+		using: (SequenceRandom withAll: #(1 2 3)).
+
+	card := deck draw.
+	deck discard: card.
+
+	self assert: deck size equals: 2.
+	self assert: deck discardSize equals: 1.
 
 
 ]

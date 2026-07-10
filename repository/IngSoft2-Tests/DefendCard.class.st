@@ -10,6 +10,12 @@ DefendCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 
 ]
 
+{ #category : #asserting }
+DefendCard >> shouldBeDiscardedAfterPlaying [
+
+	^ true
+]
+
 { #category : #validation }
 DefendCard >> shouldBeRememberedAsLastPlayedCard [
 

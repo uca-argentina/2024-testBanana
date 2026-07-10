@@ -41,6 +41,12 @@ RepeatCard >> from: aSpaceship withTarget: anotherSpaceship useIn: aGame [
 	aGame repeatLastEffectFor: anotherSpaceship  
 ]
 
+{ #category : #asserting }
+RepeatCard >> shouldBeDiscardedAfterPlaying [
+
+	^ true
+]
+
 { #category : #validation }
 RepeatCard >> shouldBeRememberedAsLastPlayedCard [
 
