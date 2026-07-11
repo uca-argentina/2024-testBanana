@@ -1590,3 +1590,25 @@ CardTest >> test132CancellationCardRemovesOnlyOneOfMultipleActiveSpeedCards [
 
 	self assert: (aGame positionOf: aSpaceship) equals: 5
 ]
+
+{ #category : #tests }
+CardTest >> test220MysteryCardEffectRemembersItsPosition [
+
+	| effect |
+
+	effect := MysteryCardEffect isIn: 5.
+
+	self assert: effect position equals: 5
+]
+
+{ #category : #tests }
+CardTest >> test221MysteryCardEffectCanChangeItsPosition [
+
+	| effect |
+
+	effect := MysteryCardEffect isIn: 5.
+
+	effect setPosition: 11.
+
+	self assert: effect position equals: 11
+]

@@ -73,3 +73,48 @@ NullEffectTest >> test172NullEffectDoesNotChangePosition [
 	self assert: (game positionOf: spaceship) equals: initial.
 
 ]
+
+{ #category : #tests }
+NullEffectTest >> test217NullEffectRemembersItsPosition [
+
+	| effect |
+
+	effect := NullEffect isIn: 4.
+
+	self assert: effect position equals: 4
+]
+
+{ #category : #tests }
+NullEffectTest >> test218NullEffectCanChangeItsPosition [
+
+	| effect |
+
+	effect := NullEffect isIn: 4.
+
+	effect setPosition: 9.
+
+	self assert: effect position equals: 9
+]
+
+{ #category : #tests }
+NullEffectTest >> test219NullEffectReturnsItselfWhenApplied [
+
+	| effect spaceship game board |
+
+	spaceship := Spaceship launch: 'One'.
+
+	board := Board
+		of: 100
+		wormholeBeginsAt: 50
+		andEndsAt: 80.
+
+	game := Game
+		playedBy: (OrderedCollection with: spaceship)
+		on: board
+		throwing: (OrderedCollection with: (LoadedDie of: 3))
+		wonAfter: 1.
+
+	effect := NullEffect isIn: 4.
+
+	self assert: (effect applyIn: game for: spaceship) == effect
+]

@@ -878,3 +878,47 @@ BoardTest >> test211HyperJumpEffectCanChangeItsPosition [
 	self assert: effect position equals: 12.
 	self assert: effect square equals: 12
 ]
+
+{ #category : #tests }
+BoardTest >> test222HyperSpaceJumpEffectRemembersItsPosition [
+
+	| effect |
+
+	effect := HyperSpaceJumpEffect isIn: 6.
+
+	self assert: effect position equals: 6
+]
+
+{ #category : #tests }
+BoardTest >> test223HyperSpaceJumpEffectCanChangeItsPosition [
+
+	| effect |
+
+	effect := HyperSpaceJumpEffect isIn: 6.
+
+	effect setPosition: 13.
+
+	self assert: effect position equals: 13
+]
+
+{ #category : #tests }
+BoardTest >> test224AtomicBombEffectRemembersItsPosition [
+
+	| effect |
+
+	effect := AtomicBombEffect isIn: 7.
+
+	self assert: effect position equals: 7
+]
+
+{ #category : #tests }
+BoardTest >> test225AtomicBombEffectCanChangeItsPosition [
+
+	| effect |
+
+	effect := AtomicBombEffect isIn: 7.
+
+	effect setPosition: 15.
+
+	self assert: effect position equals: 15
+]
