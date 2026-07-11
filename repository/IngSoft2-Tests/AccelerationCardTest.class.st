@@ -131,3 +131,66 @@ AccelerationCardTest >> test171AccelerationStacksIfPlayedTwice [
 
 
 ]
+
+{ #category : #tests }
+AccelerationCardTest >> test194AccelerationCardDoesNotCreateAnAlliance [
+
+	| card one another |
+
+	card := AccelerationCard new.
+	one := Spaceship launch: 'One'.
+	another := Spaceship launch: 'Another'.
+
+	self deny: (card is: one anAllyOf: another).
+
+	self assert:
+		(card validateAllianceBetween: one and: another) == card
+]
+
+{ #category : #tests }
+AccelerationCardTest >> test195AccelerationCardProvidesOneMovementPoint [
+
+	| card one another |
+
+	card := AccelerationCard new.
+	one := Spaceship launch: 'One'.
+	another := Spaceship launch: 'Another'.
+
+	self assert: (card movementBonusFor: one) equals: 1.
+	self assert: (card movementBonusFor: another) equals: 1
+]
+
+{ #category : #tests }
+AccelerationCardTest >> test196AccelerationCardBecomesActiveWhenPlayed [
+
+	| card owner target game board |
+
+	owner := Spaceship launch: 'Owner'.
+	target := Spaceship launch: 'Target'.
+
+	board := Board
+		of: 100
+		wormholeBeginsAt: 50
+		andEndsAt: 80.
+
+	game := Game
+		playedBy:
+			(OrderedCollection
+				with: owner
+				with: target)
+		on: board
+		throwing: (OrderedCollection with: (LoadedDie of: 3))
+		wonAfter: 1.
+
+	card := AccelerationCard new.
+
+	card
+		from: owner
+		withTarget: target
+		useIn: game.
+
+	game validateActiveCardSelected: card.
+
+	self assert: (card movementBonusFor: owner) equals: 1.
+	self assert: (card movementBonusFor: target) equals: 1
+]

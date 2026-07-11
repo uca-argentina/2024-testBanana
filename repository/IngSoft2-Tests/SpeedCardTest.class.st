@@ -109,3 +109,68 @@ SpeedCardTest >> test170SpeedDoesNotApplyWhenTargetIsDifferent [
 
 
 ]
+
+{ #category : #tests }
+SpeedCardTest >> test191SpeedCardDoesNotCreateAnAlliance [
+
+	| card one another |
+
+	card := SpeedCard new.
+	one := Spaceship launch: 'One'.
+	another := Spaceship launch: 'Another'.
+
+	self deny: (card is: one anAllyOf: another).
+
+	self assert:
+		(card validateAllianceBetween: one and: another) == card
+]
+
+{ #category : #tests }
+SpeedCardTest >> test192SpeedCardProvidesNoBonusBeforeBeingAssigned [
+
+	| card spaceship |
+
+	card := SpeedCard new.
+	spaceship := Spaceship launch: 'One'.
+
+	self assert: (card movementBonusFor: spaceship) equals: 0.
+	self assert: (card speedBonusFor: spaceship) equals: 0
+]
+
+{ #category : #tests }
+SpeedCardTest >> test193SpeedCardProvidesBonusOnlyToItsTarget [
+
+	| card owner target another game board |
+
+	owner := Spaceship launch: 'Owner'.
+	target := Spaceship launch: 'Target'.
+	another := Spaceship launch: 'Another'.
+
+	board := Board
+		of: 100
+		wormholeBeginsAt: 50
+		andEndsAt: 80.
+
+	game := Game
+		playedBy:
+			(OrderedCollection
+				with: owner
+				with: target
+				with: another)
+		on: board
+		throwing: (OrderedCollection with: (LoadedDie of: 3))
+		wonAfter: 1.
+
+	card := SpeedCard new.
+
+	card
+		from: owner
+		withTarget: target
+		useIn: game.
+
+	self assert: (card movementBonusFor: target) equals: 1.
+	self assert: (card speedBonusFor: target) equals: 1.
+
+	self assert: (card movementBonusFor: owner) equals: 0.
+	self assert: (card movementBonusFor: another) equals: 0
+]
