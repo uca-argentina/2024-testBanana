@@ -200,3 +200,45 @@ GameStateTest >> test186FinishedGameSignalsWhenNoSpaceshipReachedRequiredLaps [
 		]
 		raise: NotFound
 ]
+
+{ #category : #tests }
+GameStateTest >> test197NoPenaltyStatePlaysTurnForSpaceshipLog [
+
+	| spaceship game spaceshipLog state |
+
+	spaceship := Spaceship launch: 'One'.
+
+	game := self
+		gameWith: spaceship
+		throwing:
+			(LoadedDie arrayOf:
+				(OrderedCollection with: 3)).
+
+	spaceshipLog := game dataFor: spaceship.
+	state := NoPenaltyState new.
+
+	state playFor: spaceshipLog in: game.
+
+	self assert: (game positionOf: spaceship) equals: 4
+]
+
+{ #category : #tests }
+GameStateTest >> test198NoPenaltyStatePlaysTurnForConfiguredSpaceship [
+
+	| spaceship game state |
+
+	spaceship := Spaceship launch: 'One'.
+
+	game := self
+		gameWith: spaceship
+		throwing:
+			(LoadedDie arrayOf:
+				(OrderedCollection with: 3)).
+
+	state := NoPenaltyState new.
+	state instVarNamed: 'spaceship' put: spaceship.
+
+	state playIn: game.
+
+	self assert: (game positionOf: spaceship) equals: 4
+]
