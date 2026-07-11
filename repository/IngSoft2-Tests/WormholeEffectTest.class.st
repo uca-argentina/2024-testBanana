@@ -33,3 +33,36 @@ WormholeEffectTest >> test173WormholeTeleportsSpaceship [
 
 
 ]
+
+{ #category : #tests }
+WormholeEffectTest >> test230WormholeEffectMovesSpaceshipToItsOtherSide [
+
+	| effect spaceship game board |
+
+	spaceship := Spaceship launch: 'One'.
+
+	board := Board
+		of: 20
+		wormholeBeginsAt: 5
+		andEndsAt: 15.
+
+	game := Game
+		playedBy: (OrderedCollection with: spaceship)
+		on: board
+		throwing: (OrderedCollection with: (LoadedDie of: 3))
+		wonAfter: 1.
+
+	effect := WormholeEffect
+		isIn: 5
+		goesTo: 15.
+
+	self assert: effect position equals: 5.
+
+	effect setPosition: 6.
+
+	self assert: effect position equals: 6.
+
+	effect applyIn: game for: spaceship.
+
+	self assert: (game positionOf: spaceship) equals: 15
+]

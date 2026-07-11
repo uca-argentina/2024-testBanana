@@ -73,9 +73,10 @@ MercenaryCard >> mercenary [
 { #category : #action }
 MercenaryCard >> reinforce: aSpaceship in: aGame [
 
+	aSpaceship == ally
+		ifTrue: [ ^ aGame throwDice ].
 
-aSpaceship = ally ifTrue: [ ^aGame throwDice ].
-^0.
+	^ 0
 ]
 
 { #category : #'as yet unclassified' }

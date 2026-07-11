@@ -922,3 +922,54 @@ BoardTest >> test225AtomicBombEffectCanChangeItsPosition [
 
 	self assert: effect position equals: 15
 ]
+
+{ #category : #tests }
+BoardTest >> test231MoonWalkEffectMovesAllOtherSpaceshipsBack [
+
+	| effect protectedSpaceship affectedSpaceship game board |
+
+	protectedSpaceship := Spaceship launch: 'Protected'.
+	affectedSpaceship := Spaceship launch: 'Affected'.
+
+	board := Board
+		of: 20
+		wormholeBeginsAt: 10
+		andEndsAt: 15.
+
+	game := Game
+		playedBy:
+			(OrderedCollection
+				with: protectedSpaceship
+				with: affectedSpaceship)
+		on: board
+		throwing: (OrderedCollection with: (LoadedDie of: 3))
+		wonAfter: 1.
+
+	(game dataFor: protectedSpaceship) move: 5.
+	(game dataFor: affectedSpaceship) move: 5.
+
+	effect := MoonWalkEffect
+		isIn: 8
+		moves: 2.
+
+	effect applyIn: game for: protectedSpaceship.
+
+	self
+		assert: (game positionOf: protectedSpaceship)
+		equals: 6.
+
+	self
+		assert: (game positionOf: affectedSpaceship)
+		equals: 4
+]
+
+{ #category : #tests }
+BoardTest >> test232MoonWalkEffectCreatedFromPositionRemembersItsSquare [
+
+	| effect |
+
+	effect := MoonWalkEffect isIn: 5.
+
+	self assert: effect position equals: 5.
+	self assert: effect square equals: 5
+]
