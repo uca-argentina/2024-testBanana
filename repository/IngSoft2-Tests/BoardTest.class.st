@@ -843,3 +843,38 @@ BoardTest >> test136BoardCreatedWithLightYearsDistance [
 	self assert: aBoard lengthInLightYears equals: 6.
 	
 ]
+
+{ #category : #tests }
+BoardTest >> test210HyperJumpEffectRemembersItsPosition [
+
+	| effect distances |
+
+	distances := OrderedCollection
+		with: (ParsecDistance of: 2)
+		with: (ParsecDistance of: 3).
+
+	effect := HyperJumpEffect
+		isIn: 7
+		movesDistance: distances.
+
+	self assert: effect position equals: 7.
+	self assert: effect square equals: 7
+]
+
+{ #category : #tests }
+BoardTest >> test211HyperJumpEffectCanChangeItsPosition [
+
+	| effect distances |
+
+	distances := OrderedCollection
+		with: (ParsecDistance of: 2).
+
+	effect := HyperJumpEffect
+		isIn: 7
+		movesDistance: distances.
+
+	effect setPosition: 12.
+
+	self assert: effect position equals: 12.
+	self assert: effect square equals: 12
+]

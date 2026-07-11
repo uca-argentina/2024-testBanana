@@ -55,3 +55,74 @@ BoardDistributionCreatorTest >> test122BoardDistributionCreatorMakesABoardWithVa
 	effectTypes add: NullEffect .
 	self assert:  (squares allSatisfy: [:square | effectTypes includes: (square effect class ) ])
 ]
+
+{ #category : #tests }
+BoardDistributionCreatorTest >> test214BoardDistributionWithoutProbabilitiesCreatesNullEffects [
+
+	| creator squares probabilities |
+
+	creator := BoardDistributionCreator new.
+	probabilities := Dictionary new.
+
+	squares := creator
+		createOf: 5
+		with: probabilities
+		withParsecs: 1
+		maximumHyperJumpValues: 1.
+
+	self assert: squares size equals: 5.
+
+	squares do: [ :each |
+		self assert: each effect class equals: NullEffect
+	]
+]
+
+{ #category : #tests }
+BoardDistributionCreatorTest >> test215BoardDistributionCreatesConfiguredEffectWithFullProbability [
+
+	| creator squares probabilities effect |
+
+	creator := BoardDistributionCreator new.
+
+	probabilities := Dictionary new.
+	probabilities
+		at: BlackholeEffect
+		put: 100.
+
+	squares := creator
+		createOf: 1
+		with: probabilities
+		withParsecs: 1
+		maximumHyperJumpValues: 1.
+
+	effect := squares first effect.
+
+	self assert: squares size equals: 1.
+	self assert: effect class equals: BlackholeEffect.
+	self assert: effect position equals: 1
+]
+
+{ #category : #tests }
+BoardDistributionCreatorTest >> test216BoardDistributionCreatesHyperJumpWithFullProbability [
+
+	| creator squares probabilities effect |
+
+	creator := BoardDistributionCreator new.
+
+	probabilities := Dictionary new.
+	probabilities
+		at: HyperJumpEffect
+		put: 100.
+
+	squares := creator
+		createOf: 1
+		with: probabilities
+		withParsecs: 1
+		maximumHyperJumpValues: 1.
+
+	effect := squares first effect.
+
+	self assert: squares size equals: 1.
+	self assert: effect class equals: HyperJumpEffect.
+	self assert: effect position equals: 1
+]

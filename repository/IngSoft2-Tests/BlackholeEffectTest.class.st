@@ -1,11 +1,11 @@
 Class {
-	#name : #BlackHoleEffect,
+	#name : #BlackholeEffectTest,
 	#superclass : #TestCase,
 	#category : #'IngSoft2-Tests'
 }
 
 { #category : #tests }
-BlackHoleEffect >> test174BlackHoleSendsSpaceshipToBeginning [
+BlackholeEffectTest >> test174BlackHoleSendsSpaceshipToBeginning [
 	| game spaceship die board squares initialShields deck probabilities |
 
 	spaceship := Spaceship launch: 'A'.
@@ -44,4 +44,26 @@ BlackHoleEffect >> test174BlackHoleSendsSpaceshipToBeginning [
 	self assert: (game shieldsOf: spaceship) equals: initialShields.
 
 
+]
+
+{ #category : #tests }
+BlackholeEffectTest >> test212BlackholeEffectRemembersItsPosition [
+
+	| effect |
+
+	effect := BlackholeEffect isIn: 7.
+
+	self assert: effect position equals: 7
+]
+
+{ #category : #tests }
+BlackholeEffectTest >> test213BlackholeEffectCanChangeItsPosition [
+
+	| effect |
+
+	effect := BlackholeEffect isIn: 7.
+
+	effect setPosition: 12.
+
+	self assert: effect position equals: 12
 ]
